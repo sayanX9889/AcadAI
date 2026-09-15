@@ -21,7 +21,9 @@ OPENROUTER_MODEL = os.getenv(
     "openrouter/free"
 )
 
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_URL = (
+    "https://openrouter.ai/api/v1/chat/completions"
+)
 
 
 # ============================================================
@@ -32,6 +34,10 @@ def generate_with_ollama(
     prompt: str,
     system_prompt: str = ""
 ) -> str:
+
+    # Import Ollama only when it is actually being used.
+    # This prevents cloud deployment from requiring
+    # a running Ollama server.
 
     import ollama
 
@@ -75,11 +81,14 @@ def generate_with_openrouter(
     system_prompt: str = ""
 ) -> str:
 
-    api_key = os.getenv("OPENROUTER_API_KEY")
+    api_key = os.getenv(
+        "OPENROUTER_API_KEY"
+    )
 
     if not api_key:
         raise RuntimeError(
-            "OPENROUTER_API_KEY environment variable is not set."
+            "OPENROUTER_API_KEY environment variable "
+            "is not set."
         )
 
     messages = []
@@ -126,7 +135,12 @@ def generate_with_openrouter(
 
     try:
         content = data["choices"][0]["message"]["content"]
-    except (KeyError, IndexError, TypeError):
+
+    except (
+        KeyError,
+        IndexError,
+        TypeError
+    ):
         raise RuntimeError(
             f"Unexpected OpenRouter response: {data}"
         )

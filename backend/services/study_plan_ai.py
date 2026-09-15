@@ -1,7 +1,8 @@
 import json
 
-from backend.services.model_service import generate_ai_response
-
+from backend.services.model_service import (
+    generate_ai_response as generate_model_response
+)
 
 
 def generate_ai_study_plan(
@@ -28,26 +29,36 @@ STRICT RULES:
 8. If information is missing, clearly say so.
 """
 
-
+    # Convert study plan to JSON
     context = json.dumps(
         study_plan,
         indent=2,
         default=str
     )
 
-
     prompt = f"""
 {system_prompt}
 
-WEEKLY STUDY HOURS:
+==============================
+WEEKLY STUDY HOURS
+==============================
+
 {weekly_hours}
 
-ACADEMIC PLANNER DATA:
+==============================
+ACADEMIC PLANNER DATA
+==============================
+
 {context}
+
+==============================
+TASK
+==============================
 
 Create a concise personalized weekly study schedule.
 
 For each subject, include:
+
 - Subject name
 - Allocated weekly hours
 - What to study
@@ -56,8 +67,8 @@ For each subject, include:
 Do not change the allocated hours.
 """
 
-
-    return generate_ai_response(
+    # Send request to the selected AI provider.
+    return generate_model_response(
         prompt=prompt,
         system_prompt=system_prompt
     )
