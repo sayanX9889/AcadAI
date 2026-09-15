@@ -371,12 +371,12 @@ def hash_reset_value(value: str) -> str:
 
 
 def send_password_reset_email(email: str, otp: str):
-    gmail_address = os.getenv("GMAIL_ADDRESS")
-    gmail_app_password = os.getenv("GMAIL_APP_PASSWORD")
+    gmail_address = os.getenv("SMTP_EMAIL")
+    gmail_app_password = os.getenv("SMTP_APP_PASSWORD")
 
     if not gmail_address or not gmail_app_password:
         raise RuntimeError(
-            "GMAIL_ADDRESS and GMAIL_APP_PASSWORD are not configured."
+            "SMTP_EMAIL and SMTP_APP_PASSWORD are not configured."
         )
 
     message = EmailMessage()
