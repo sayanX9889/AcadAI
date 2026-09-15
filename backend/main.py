@@ -18,7 +18,8 @@ from backend.routes.academic_profile import router as academic_profile_router
 from backend.routes.feedback import router as feedback_router
 from backend.routes.feedback import initialize_feedback_table
 from backend.routes.quiz import router as quiz_router
-
+from backend.routes.notifications import router as notifications_router
+from backend.routes.notifications import initialize_notifications_table
 
 app = FastAPI(
     title="AI Academic Advisor",
@@ -28,6 +29,7 @@ app = FastAPI(
 
 initialize_database()
 initialize_feedback_table()
+initialize_notifications_table()
 
 app.mount(
     "/uploads",
@@ -52,6 +54,7 @@ app.include_router(auth_router)
 app.include_router(academic_profile_router)
 app.include_router(feedback_router)
 app.include_router(quiz_router)
+app.include_router(notifications_router)
 
 
 @app.get("/")

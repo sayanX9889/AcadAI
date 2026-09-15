@@ -10,6 +10,21 @@
 <style>
 body{font-family:Inter,ui-sans-serif,system-ui,sans-serif}.option{transition:.18s}.option:hover{transform:translateY(-1px)}.option.selected{border-color:#6366f1;background:#eef2ff}.score-ring{background:conic-gradient(#4f46e5 var(--score),#e2e8f0 0)}
 </style>
+
+<style id="acadai-mobile-menu-styles">
+@media (max-width: 1023px) {
+  body.acadai-menu-open { overflow: hidden; }
+  #mobile-acadai-menu {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-menu-item {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-menu-item:active { background: rgba(255,255,255,.08); }
+}
+</style>
+
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
 <div class="min-h-screen lg:flex">
@@ -27,8 +42,127 @@ body{font-family:Inter,ui-sans-serif,system-ui,sans-serif}.option{transition:.18
 <div class="border-t border-slate-800 pt-4"><div class="flex items-center gap-3"><img id="student-profile-image" class="student-profile-image h-10 w-10 rounded-full border-2 border-indigo-500 object-cover" src="https://ui-avatars.com/api/?name=Student&background=e0e7ff&color=4f46e5&size=128" alt="Student Profile"><div class="min-w-0"><p id="sidebar-student-name" class="truncate text-sm font-semibold text-white">Student</p><p id="sidebar-student-id" class="truncate text-xs text-slate-500">--</p></div></div><button type="button" onclick="logout()" class="mt-3 w-full rounded-lg border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white"><i class="fa-solid fa-right-from-bracket mr-2"></i>Logout</button></div>
 </aside>
 <div class="flex min-w-0 flex-1 flex-col lg:ml-64">
-<header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur"><div class="flex min-h-16 items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8"><div><h1 class="text-base font-bold sm:text-lg">Instant AI Quiz</h1><p class="mt-1 text-xs text-slate-500">Practice what you fear. Learn what you miss.</p></div><a href="dashboard.html" class="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"><i class="fa-solid fa-arrow-left mr-1"></i>Dashboard</a></div>
-<nav class="flex gap-1 overflow-x-auto border-t border-slate-100 px-4 py-2 text-xs font-medium text-slate-500 lg:hidden"><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100" href="dashboard.html">Dashboard</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100" href="attendance.html">Attendance</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100" href="study-plan.html">Study Plan</a><a class="shrink-0 rounded-md bg-indigo-50 px-3 py-2 text-indigo-700" href="quiz.html">Quizzes</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100" href="recommendations.html">Recommendations</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100" href="chatbot.html">AI Chatbot</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100" href="feedback.html">Feedback</a></nav></header>
+<header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur"><div class="flex min-h-16 items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8"><div><h1 class="text-base font-bold sm:text-lg">Instant AI Quiz</h1><p class="mt-1 text-xs text-slate-500">Practice what you fear. Learn what you miss.</p></div><a href="dashboard.html" class="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 hidden sm:inline-flex"><i class="fa-solid fa-arrow-left mr-1"></i>Dashboard</a>
+            <button id="mobile-menu-button" type="button" aria-label="Open menu" title="Menu"
+              class="lg:hidden grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50">
+              <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+</div></header>
+
+<div id="mobile-acadai-menu" class="fixed inset-x-0 bottom-0 top-16 z-40 hidden overflow-y-auto bg-[#020b3a] text-white lg:hidden">
+  <div class="mx-auto w-full max-w-xl px-4 pb-8 pt-4">
+    <div class="mb-4 rounded-2xl border border-white/10 bg-white/5 p-4 shadow-lg">
+      <div class="flex items-center gap-4">
+        <button id="mobile-menu-profile-button" type="button" class="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-indigo-400 bg-indigo-100 shadow-lg" aria-label="Change profile picture" title="Change profile picture">
+          <img id="mobile-menu-profile-image" class="student-profile-image h-full w-full object-cover" src="https://ui-avatars.com/api/?name=Student&background=e0e7ff&color=4f46e5&size=128" alt="Student Profile">
+          <span class="absolute inset-x-0 bottom-0 bg-black/50 py-1 text-center text-[10px] font-semibold"><i class="fa-solid fa-camera"></i></span>
+        </button>
+        <input id="mobile-menu-profile-input" type="file" accept="image/jpeg,image/png,image/webp" class="hidden">
+        <div class="min-w-0 flex-1">
+          <p id="mobile-menu-student-name" class="truncate text-base font-bold">Student</p>
+          <p id="mobile-menu-student-id" class="mt-0.5 truncate text-xs text-white/60">--</p>
+          <button id="mobile-menu-change-photo" type="button" class="mt-2 text-xs font-semibold text-indigo-300 hover:text-white">Change Profile Picture</button>
+        </div>
+      </div>
+      <div class="mt-4 grid grid-cols-2 gap-2">
+        <div class="rounded-xl bg-white/5 p-3">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-white/45">Semester</p>
+          <p id="mobile-menu-semester" class="mt-1 truncate text-sm font-semibold text-white">--</p>
+        </div>
+        <div class="rounded-xl bg-white/5 p-3">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-white/45">Academic Year</p>
+          <p id="mobile-menu-year" class="mt-1 truncate text-sm font-semibold text-white">--</p>
+        </div>
+      </div>
+      <div class="mt-2 rounded-xl bg-white/5 p-3">
+        <p class="text-[10px] font-semibold uppercase tracking-wider text-white/45">Career Goal</p>
+        <p id="mobile-menu-career" class="mt-1 truncate text-sm font-semibold text-white">--</p>
+      </div>
+      <a href="academic-profile.html" class="mt-3 flex items-center justify-between rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">
+        <span><i class="fa-solid fa-graduation-cap mr-2"></i>Academic Details</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+      
+          <a href="dashboard.html" class="mobile-menu-item flex min-h-[64px] items-center justify-between border-b border-white/10 px-5 py-4 transition text-white/90">
+            <span class="flex items-center gap-4">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-base text-white">
+                <i class="fa-solid fa-chart-pie"></i>
+              </span>
+              <span class="text-lg font-semibold tracking-tight">Dashboard</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-sm text-white/60"></i>
+          </a>
+          <a href="attendance.html" class="mobile-menu-item flex min-h-[64px] items-center justify-between border-b border-white/10 px-5 py-4 transition text-white/90">
+            <span class="flex items-center gap-4">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-base text-white">
+                <i class="fa-solid fa-user-check"></i>
+              </span>
+              <span class="text-lg font-semibold tracking-tight">Attendance</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-sm text-white/60"></i>
+          </a>
+          <a href="study-plan.html" class="mobile-menu-item flex min-h-[64px] items-center justify-between border-b border-white/10 px-5 py-4 transition text-white/90">
+            <span class="flex items-center gap-4">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-base text-white">
+                <i class="fa-solid fa-calendar-check"></i>
+              </span>
+              <span class="text-lg font-semibold tracking-tight">Study Plan</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-sm text-white/60"></i>
+          </a>
+          <a href="quiz.html" class="mobile-menu-item flex min-h-[64px] items-center justify-between border-b border-white/10 px-5 py-4 transition bg-white/10 text-white">
+            <span class="flex items-center gap-4">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-base text-white">
+                <i class="fa-solid fa-clipboard-question"></i>
+              </span>
+              <span class="text-lg font-semibold tracking-tight">Quizzes</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-sm text-white/60"></i>
+          </a>
+          <a href="recommendations.html" class="mobile-menu-item flex min-h-[64px] items-center justify-between border-b border-white/10 px-5 py-4 transition text-white/90">
+            <span class="flex items-center gap-4">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-base text-white">
+                <i class="fa-solid fa-compass"></i>
+              </span>
+              <span class="text-lg font-semibold tracking-tight">Recommendations</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-sm text-white/60"></i>
+          </a>
+          <a href="chatbot.html" class="mobile-menu-item flex min-h-[64px] items-center justify-between border-b border-white/10 px-5 py-4 transition text-white/90">
+            <span class="flex items-center gap-4">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-base text-white">
+                <i class="fa-solid fa-robot"></i>
+              </span>
+              <span class="text-lg font-semibold tracking-tight">AI Chatbot</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-sm text-white/60"></i>
+          </a>
+          <a href="feedback.html" class="mobile-menu-item flex min-h-[64px] items-center justify-between border-b border-white/10 px-5 py-4 transition text-white/90">
+            <span class="flex items-center gap-4">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-base text-white">
+                <i class="fa-solid fa-message"></i>
+              </span>
+              <span class="text-lg font-semibold tracking-tight">Feedback</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-sm text-white/60"></i>
+          </a>
+    </div>
+    <div class="mt-4 grid gap-2">
+      <button type="button" onclick="logout(); closeMobileAcadAIMenu();" class="flex min-h-[58px] items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-5 text-base font-semibold text-white transition hover:bg-white/10">
+        <span class="grid h-10 w-10 place-items-center rounded-xl bg-white/10"><i class="fa-solid fa-right-from-bracket"></i></span>
+        Logout
+      </button>
+      <button type="button" onclick="if(typeof deleteAccount==='function') deleteAccount();" class="flex min-h-[58px] items-center gap-4 rounded-2xl border border-rose-400/20 bg-rose-500/10 px-5 text-base font-semibold text-rose-200 transition hover:bg-rose-500/20">
+        <span class="grid h-10 w-10 place-items-center rounded-xl bg-rose-500/10"><i class="fa-solid fa-trash"></i></span>
+        Delete Account
+      </button>
+    </div>
+  </div>
+</div>
+
+
 <main class="mx-auto w-full max-w-screen-2xl flex-1 space-y-6 p-4 sm:p-6 lg:p-8">
 <section class="rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-violet-50 p-6 shadow-sm sm:p-8"><div class="max-w-3xl"><span class="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-700"><i class="fa-solid fa-wand-magic-sparkles"></i>AI-powered practice</span><h2 class="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">Test the topic you fear right now.</h2><p class="mt-3 text-sm leading-6 text-slate-600 sm:text-base">Tell AcadAI the subject and topic you are struggling with. It will create exactly 10 practice questions and show your result immediately.</p></div></section>
 <section class="rounded-2xl border border-amber-200 bg-amber-50 p-5 sm:p-6"><div class="flex gap-4"><div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-700"><i class="fa-solid fa-shield-halved"></i></div><div><h3 class="font-bold text-amber-950">Academic Integrity Declaration</h3><p class="mt-2 text-sm leading-6 text-amber-900">This quiz is designed to help you identify and improve your own weak areas. Please answer every question yourself without using ChatGPT, Gemini, search engines, or any other AI/tool for assistance.</p><p class="mt-2 text-sm font-semibold leading-6 text-amber-900">Your score is not stored in the database. It is only for immediate self-assessment and learning.</p><label class="mt-4 flex cursor-pointer items-start gap-3 text-sm text-amber-950"><input id="declaration" type="checkbox" class="mt-1 h-4 w-4 rounded border-amber-400 text-indigo-600 focus:ring-indigo-500"><span>I understand and agree to attempt this quiz honestly for my own learning and improvement.</span></label></div></div></section>
@@ -69,4 +203,155 @@ $("review-list").innerHTML=currentResult.review.map((q,i)=>{const correct=q.is_c
 function showQuizAgain(){if(!currentQuiz)return;lastAnswers={};currentResult=null;renderQuiz();showSection("quiz-section");}
 function startNewTopic(){currentQuiz=null;currentQuizId=null;currentResult=null;lastAnswers={};$("subject").value="";$("topic").value="";$("declaration").checked=false;hideError();showSection("setup-section");}
 </script>
+
+<script id="acadai-mobile-menu-script">
+(function () {
+  "use strict";
+
+  function mobileApiUrl() {
+    return (typeof API_URL !== "undefined" && API_URL) ||
+      "https://acad-ai-backend-6494.onrender.com";
+  }
+
+  function mobileStudentId() {
+    if (typeof STUDENT_ID !== "undefined" && STUDENT_ID) return STUDENT_ID;
+    return localStorage.getItem("student_id") || "";
+  }
+
+  window.openMobileAcadAIMenu = function () {
+    const menu = document.getElementById("mobile-acadai-menu");
+    if (!menu) return;
+    menu.classList.remove("hidden");
+    document.body.classList.add("acadai-menu-open");
+  };
+
+  window.closeMobileAcadAIMenu = function () {
+    const menu = document.getElementById("mobile-acadai-menu");
+    if (!menu) return;
+    menu.classList.add("hidden");
+    document.body.classList.remove("acadai-menu-open");
+  };
+
+  window.toggleMobileAcadAIMenu = function () {
+    const menu = document.getElementById("mobile-acadai-menu");
+    if (!menu) return;
+    menu.classList.contains("hidden")
+      ? window.openMobileAcadAIMenu()
+      : window.closeMobileAcadAIMenu();
+  };
+
+  async function loadMobileProfile() {
+    const sid = mobileStudentId();
+    if (!sid) return;
+
+    // Let the shared auth helper update existing profile images when available.
+    try {
+      if (typeof loadStudentProfile === "function") {
+        await loadStudentProfile(mobileApiUrl());
+      }
+    } catch (e) {
+      console.warn("Shared profile loader unavailable:", e);
+    }
+
+    try {
+      const response = await fetch(`${mobileApiUrl()}/students/${encodeURIComponent(sid)}`);
+      if (!response.ok) return;
+      const student = await response.json();
+
+      const setText = (id, value, fallback="--") => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value ?? fallback;
+      };
+
+      setText("mobile-menu-student-name", student.name, "Student");
+      setText("mobile-menu-student-id", student.student_id || sid, sid);
+      setText("mobile-menu-semester", student.current_semester);
+      setText("mobile-menu-year", student.academic_year);
+      setText("mobile-menu-career", student.career_goal, "Not specified");
+    } catch (error) {
+      console.warn("Mobile profile details could not be loaded:", error);
+    }
+  }
+
+  async function uploadMobileProfilePicture(file) {
+    const sid = mobileStudentId();
+    if (!sid || !file) return;
+
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      alert("Only JPG, PNG or WEBP images are allowed.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image must be smaller than 5 MB.");
+      return;
+    }
+
+    const button = document.getElementById("mobile-menu-profile-button");
+    if (button) button.disabled = true;
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(
+        `${mobileApiUrl()}/auth/profile-picture/${encodeURIComponent(sid)}`,
+        { method: "POST", body: formData }
+      );
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.detail || data.error || "Profile picture upload failed.");
+      }
+
+      const imageUrl = mobileApiUrl() + data.profile_picture + "?t=" + Date.now();
+      document.querySelectorAll(".student-profile-image").forEach(img => img.src = imageUrl);
+
+      const profileButton = document.getElementById("mobile-menu-profile-button");
+      if (profileButton) {
+        profileButton.classList.add("ring-2", "ring-emerald-400");
+        setTimeout(() => profileButton.classList.remove("ring-2", "ring-emerald-400"), 1600);
+      }
+    } catch (error) {
+      console.error("Profile picture upload error:", error);
+      alert(error.message || "Unable to update profile picture.");
+    } finally {
+      if (button) button.disabled = false;
+      const input = document.getElementById("mobile-menu-profile-input");
+      if (input) input.value = "";
+    }
+  }
+
+  function initMobileMenu() {
+    const button = document.getElementById("mobile-menu-button");
+    const close = document.getElementById("mobile-menu-close");
+    const profileButton = document.getElementById("mobile-menu-profile-button");
+    const photoButton = document.getElementById("mobile-menu-change-photo");
+    const input = document.getElementById("mobile-menu-profile-input");
+
+    if (button) button.addEventListener("click", window.toggleMobileAcadAIMenu);
+    if (close) close.addEventListener("click", window.closeMobileAcadAIMenu);
+    if (profileButton && input) profileButton.addEventListener("click", () => input.click());
+    if (photoButton && input) photoButton.addEventListener("click", () => input.click());
+    if (input) input.addEventListener("change", e => uploadMobileProfilePicture(e.target.files[0]));
+
+    document.querySelectorAll("#mobile-acadai-menu a").forEach(a => {
+      a.addEventListener("click", () => window.closeMobileAcadAIMenu());
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") window.closeMobileAcadAIMenu();
+    });
+
+    loadMobileProfile();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMobileMenu);
+  } else {
+    initMobileMenu();
+  }
+})();
+</script>
+
 </body></html>
