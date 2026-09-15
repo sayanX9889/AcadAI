@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AcadAI Advisor — Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] }, boxShadow: { card: '0 10px 25px -12px rgb(15 23 42 / .14)' } } } }</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900">
+  <div class="min-h-screen lg:flex">
+    <aside
+      class="hidden w-64 shrink-0 flex-col justify-between bg-slate-950 px-4 py-6 text-slate-300 lg:fixed lg:inset-y-0 lg:left-0 lg:flex">
+      <div>
+        <a href="dashboard.html" class="flex items-center gap-3 border-b border-slate-800 pb-6 text-white"><span
+            class="grid h-10 w-10 place-items-center rounded-xl bg-indigo-600 text-lg"><i
+              class="fa-solid fa-graduation-cap"></i></span><span class="text-lg font-bold tracking-tight">AcadAI
+            Advisor</span></a>
+        <nav class="mt-6 space-y-1" aria-label="Primary navigation">
+          <a href="#"
+            class="flex items-center gap-3 rounded-lg bg-indigo-600 px-3.5 py-3 text-sm font-semibold text-white"><i
+              class="fa-solid fa-chart-pie w-5 text-center"></i>Dashboard</a>
+          <!-- <a href="#subjects"
+            class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+              class="fa-solid fa-book-open w-5 text-center"></i>Subjects &amp; Marks</a> -->
+          <a href="attendance.html"
+            class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+              class="fa-solid fa-user-check w-5 text-center"></i>Attendance</a>
+          <a href="study-plan.html"
+            class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+              class="fa-solid fa-calendar-check w-5 text-center"></i>Study Plan</a>
+          <a href="quiz.html"
+            class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+              class="fa-solid fa-calendar-check w-5 text-center"></i>Quizes</a>
+          <a href="recommendations.html"
+            class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+              class="fa-solid fa-compass w-5 text-center"></i>Recommendations</a>
+          <a href="chatbot.html"
+            class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+              class="fa-solid fa-robot w-5 text-center"></i>AI Chatbot</a>
+          <a href="feedback.html"
+            class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+              class="fa-solid fa-calendar-check w-5 text-center"></i>Feedback</a>
+        </nav>
+      </div>
+      <div class="border-t border-slate-800 pt-4">
+
+        <div class="flex items-center gap-3">
+
+          <img id="student-profile-image"
+            class="student-profile-image h-10 w-10 rounded-full border-2 border-indigo-500 object-cover"
+            src="https://ui-avatars.com/api/?name=Student&background=e0e7ff&color=4f46e5&size=128"
+            alt="Student Profile">
+
+          <div class="min-w-0">
+
+            <p id="sidebar-student-name" class="truncate text-sm font-semibold text-white">
+              Student
+            </p>
+
+            <p id="sidebar-student-id" class="truncate text-xs text-slate-500">
+              --
+            </p>
+
+            <!-- PROFILE PICTURE UPLOAD -->
+
+            <label for="profile-picture-input" class="mt-1 inline-block cursor-pointer text-xs
+               font-medium text-indigo-400
+               hover:text-indigo-300">
+              <i class="fa-solid fa-camera mr-1"></i>
+              Change Profile Picture
+            </label>
+
+            <input id="profile-picture-input" type="file" accept="image/jpeg,image/png,image/webp" class="hidden">
+
+            <p id="profile-upload-status" class="mt-1 hidden text-xs"></p>
+            <!-- ACADEMIC PROFILE -->
+
+            <a href="academic-profile.html"
+              class="mt-2 inline-block text-xs font-medium text-indigo-400 hover:text-indigo-300">
+              <i class="fa-solid fa-graduation-cap mr-1"></i>
+              Edit Academic Profile
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <button type="button" onclick="logout()" class="mt-3 w-full rounded-lg
+        border border-slate-700
+        px-3 py-2
+        text-xs font-semibold
+        text-slate-300
+        transition
+        hover:bg-slate-800
+        hover:text-white">
+
+          <i class="fa-solid fa-right-from-bracket mr-2"></i>
+
+          Logout
+
+        </button>
+
+        <button type="button" onclick="deleteAccount()" class="mt-2 w-full rounded-lg
+        border border-rose-800
+        px-3 py-2
+        text-xs font-semibold
+        text-rose-400
+        transition
+        hover:bg-rose-950
+        hover:text-rose-300">
+
+          <i class="fa-solid fa-trash mr-2"></i>
+
+          Delete Account
+
+        </button>
+
+      </div>
+    </aside>
+    <div class="flex min-w-0 flex-1 flex-col lg:ml-64">
+      <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div class="flex min-h-16 items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <div class="flex min-w-0 items-center gap-3"><span
+              class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-indigo-600 text-white lg:hidden"><i
+                class="fa-solid fa-graduation-cap"></i></span>
+            <div class="min-w-0">
+              <h1 class="truncate text-sm font-bold sm:text-base">Department of Computer Science &amp; Engineering</h1>
+              <p class="mt-0.5 text-xs text-slate-500">
+                Semester <span id="student-semester">--</span>
+                <span class="hidden sm:inline">
+                  | Academic Year
+                  <span id="student-academic-year">--</span>
+                </span>
+              </p>
+            </div>
+          </div>
+          <div class="flex shrink-0 items-center gap-2"><a href="chatbot.html"
+              class="hidden items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100 sm:inline-flex">
+              <i class="fa-solid fa-sparkles"></i>
+              <span class="hidden md:inline">Ask AI Advisor</span>
+            </a><a href="chatbot.html" aria-label="Ask AI Advisor"
+              class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-50 text-xl text-indigo-700 sm:hidden">
+              <i class="fa-solid fa-sparkles"></i>
+              <span class="md:inline">AI</span>
+            </a>
+            <!-- <button type="button" aria-label="Notifications"
+              class="grid h-9 w-9 place-items-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50">
+              <i class="fa-regular fa-bell"></i>
+            </button> -->
+
+            <!-- =====================================================
+     MOBILE PROFILE CONTROLS
+     ===================================================== -->
+
+            <div class="sm:hidden flex items-center gap-2">
+
+              <!-- CHANGE PROFILE PHOTO -->
+              <button type="button" id="mobile-profile-picture-button" aria-label="Change Profile Picture"
+                title="Change Profile Picture" class="grid h-9 w-9 shrink-0 place-items-center
+           overflow-hidden rounded-full
+           border-2 border-indigo-500
+           bg-indigo-50
+           transition
+           hover:ring-2
+           hover:ring-indigo-200">
+
+                <img class="student-profile-image h-full w-full object-cover"
+                  src="https://ui-avatars.com/api/?name=Student&background=e0e7ff&color=4f46e5&size=128"
+                  alt="Student Profile">
+
+              </button>
+
+
+              <!-- HIDDEN MOBILE FILE INPUT -->
+
+              <input id="mobile-profile-picture-input" type="file" accept="image/jpeg,image/png,image/webp"
+                class="hidden">
+
+
+              <!-- EDIT ACADEMIC DETAILS -->
+
+              <a href="academic-profile.html" aria-label="Edit Academic Profile" title="Edit Academic Profile" class="grid h-9 w-9 shrink-0 place-items-center
+           rounded-lg
+           border border-indigo-200
+           bg-indigo-50
+           text-indigo-700
+           transition
+           hover:bg-indigo-100">
+
+                <i class="fa-solid fa-user-pen"></i>
+
+              </a>
+
+            </div>
+
+            <!-- MOBILE LOGOUT -->
+            <button type="button" onclick="logout()" aria-label="Logout" title="Logout"
+              class="sm:hidden grid h-9 w-9 place-items-center rounded-lg border border-red-200 text-red-500 transition hover:bg-red-50 hover:text-red-600">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+
+            <!-- MOBILE DELETE ACCOUNT -->
+            <button type="button" onclick="deleteAccount()" aria-label="Delete Account" title="Delete Account"
+              class="sm:hidden grid h-9 w-9 place-items-center rounded-lg border border-rose-200 text-rose-500 transition hover:bg-rose-50 hover:text-rose-600">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+        <nav
+          class="flex gap-1 overflow-x-auto border-t border-slate-100 px-4 py-2 text-xs font-medium text-slate-500 lg:hidden"
+          aria-label="Mobile navigation"><a class="shrink-0 rounded-md bg-indigo-50 px-3 py-2 text-indigo-700"
+            href="#">Dashboard</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100"
+            href="attendance.html">Attendance</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100"
+            href="study-plan.html">Study plan</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100"
+            href="quiz.html">Quizes</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100"
+            href="recommendations.html">Recommendations</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100"
+            href="chatbot.html">AI Chatbot</a><a class="shrink-0 rounded-md px-3 py-2 hover:bg-slate-100"
+            href="feedback.html">Feedback</a></nav>
+      </header>
+      <main class="mx-auto w-full max-w-screen-2xl flex-1 space-y-5 p-4 sm:space-y-6 sm:p-6 lg:p-8">
+        <section class="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-amber-900 sm:p-4"
+          aria-label="Academic diagnosis"><i class="fa-solid fa-bolt-lightning mt-0.5 text-amber-500"></i>
+          <p id="academic-diagnosis" class="text-xs leading-5 sm:text-sm">
+            <strong>AI Academic Diagnosis:</strong>
+            Loading academic analysis...
+          </p>
+        </section>
+        <section class="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4" aria-label="Academic metrics">
+          <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-card sm:p-5">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Current CGPA</p>
+                <p id="student-cgpa" class="mt-2 text-3xl font-bold tracking-tight">--</p>
+                <p id="cgpa-status" class="mt-2 text-xs font-medium text-slate-500">
+                  Academic performance
+                </p>
+              </div><span class="grid h-12 w-12 place-items-center rounded-xl bg-indigo-50 text-xl text-indigo-600"><i
+                  class="fa-solid fa-award"></i></span>
+            </div>
+          </article>
+          <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-card sm:p-5">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Average Attendance</p>
+                <p id="student-attendance" class="mt-2 text-3xl font-bold tracking-tight">
+                  --
+                </p>
+                <p class="mt-2 text-xs font-medium text-emerald-600"><i class="fa-solid fa-check mr-1"></i>Above 75%
+                  Criteria</p>
+              </div><span class="grid h-12 w-12 place-items-center rounded-xl bg-emerald-50 text-xl text-emerald-500"><i
+                  class="fa-solid fa-percent"></i></span>
+            </div>
+          </article>
+          <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-card sm:p-5">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Weak Subjects</p>
+                <p id="weak-subject-count" class="mt-2 text-3xl font-bold tracking-tight">--</p>
+                <p class="mt-2 text-xs font-medium text-rose-500"><i
+                    class="fa-solid fa-triangle-exclamation mr-1"></i>Immediate Review</p>
+              </div><span class="grid h-12 w-12 place-items-center rounded-xl bg-rose-50 text-xl text-rose-500"><i
+                  class="fa-solid fa-circle-exclamation"></i></span>
+            </div>
+          </article>
+          <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-card sm:p-5">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Target Career Match</p>
+                <p id="career-match" class="mt-2 text-3xl font-bold tracking-tight">--</p>
+                <p id="career-goal" class="mt-2 text-xs font-medium text-amber-600">
+                  <i class="fa-solid fa-bullseye mr-1"></i>
+                  --
+                </p>
+              </div><span class="grid h-12 w-12 place-items-center rounded-xl bg-amber-50 text-xl text-amber-500"><i
+                  class="fa-solid fa-target"></i></span>
+            </div>
+          </article>
+        </section>
+        <section id="subjects" class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <div class="mb-5 flex items-center justify-between gap-3">
+            <h2 class="text-base font-bold sm:text-lg">Subject Performance &amp; Marks</h2><button
+              class="inline-flex items-center gap-2 rounded-lg bg-indigo-50 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"><i
+                class="fa-solid fa-sliders"></i>Filter</button>
+          </div>
+          <div id="subject-cards" class="grid gap-3 md:grid-cols-2 xl:grid-cols-3 sm:gap-4"></div>
+        </section>
+        <section id="recommendations" class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <h2 class="mb-5 text-base font-bold sm:text-lg">AI Academic Recommendations</h2>
+          <div id="recommendation-cards" class="grid gap-3 md:grid-cols-2 xl:grid-cols-3 sm:gap-4"></div>
+        </section>
+      </main>
+      <footer class="border-t border-slate-200 px-4 py-5 text-center text-xs leading-5 text-slate-500 sm:px-6">
+        <p>© 2026 AcadAI Advisor. Empowering students with AI-driven academic guidance. <span class="hidden sm:inline">
+            | Semester <span id="footer-semester">--</span> Dashboard
+          </span></p>
+        <p id="sidebar-student-name" class="mt-1 text-slate-400">
+              Student
+            </p>
+      </footer>
+    </div>
+  </div>
+  <script src="js/auth.js"></script>
+
+  <script>
+
+    requireLogin();
+
+    // ==========================================
+    // LOAD COMPLETE DASHBOARD
+    // ==========================================
+
+    async function loadDashboard() {
+
+      try {
+
+        // ==================================
+        // 1. LOAD STUDENT
+        // ==================================
+
+        const studentResponse = await fetch(
+          `${API_URL}/students/${STUDENT_ID}`
+        );
+
+        if (!studentResponse.ok) {
+          throw new Error(
+            `Student API error: ${studentResponse.status}`
+          );
+        }
+
+        const student =
+          await studentResponse.json();
+
+
+        if (student.error) {
+          throw new Error(student.error);
+        }
+
+
+        // ==================================
+        // 2. DISPLAY STUDENT INFORMATION
+        // ==================================
+
+        document.getElementById(
+          "student-cgpa"
+        ).textContent = student.cgpa;
+
+
+        document.getElementById(
+          "student-semester"
+        ).textContent = student.current_semester;
+
+
+        document.getElementById(
+          "sidebar-student-name"
+        ).textContent =
+          student.name || "Student";
+
+
+        document.getElementById(
+          "sidebar-student-id"
+        ).textContent =
+          student.student_id || STUDENT_ID;
+
+
+        document.getElementById(
+          "footer-semester"
+        ).textContent =
+          student.current_semester;
+
+
+        document.getElementById(
+          "career-goal"
+        ).innerHTML =
+          `<i class="fa-solid fa-bullseye mr-1"></i>
+        ${student.career_goal || "Not specified"}`;
+
+
+        // ==================================
+        // 3. LOAD ACADEMIC ANALYSIS
+        // ==================================
+
+        const analysisResponse = await fetch(
+          `${API_URL}/students/${STUDENT_ID}/analysis`
+        );
+
+
+        if (!analysisResponse.ok) {
+
+          throw new Error(
+            `Analysis API error: ${analysisResponse.status}`
+          );
+
+        }
+
+
+        const analysis =
+          await analysisResponse.json();
+
+        if (analysis.error) {
+
+          throw new Error(
+            analysis.error
+          );
+
+        }
+
+
+        // ==================================
+        // DISPLAY CURRENT ACADEMIC YEAR
+        // ==================================
+
+        const academicYearElement =
+          document.getElementById(
+            "student-academic-year"
+          );
+
+        if (academicYearElement) {
+
+          academicYearElement.textContent =
+            analysis.academic_year || "--";
+
+        }
+
+        // ==================================
+        // DISPLAY TARGET CAREER MATCH
+        // ==================================
+
+        const careerMatchElement =
+          document.getElementById("career-match");
+
+        if (careerMatchElement && analysis.career_match) {
+          careerMatchElement.textContent =
+            `${analysis.career_match.match_percentage}%`;
+        }
+
+
+        console.log(
+          "Academic analysis:",
+          analysis
+        );
+        renderRecommendations(analysis.recommendations);
+
+
+        // ==================================
+        // 4. DISPLAY ATTENDANCE
+        // ==================================
+
+        document.getElementById(
+          "student-attendance"
+        ).textContent =
+          `${analysis.average_attendance}%`;
+
+        const attendanceStatus =
+          document.getElementById("attendance-status");
+
+        if (attendanceStatus) {
+
+          if (Number(analysis.average_attendance) >= 75) {
+
+            attendanceStatus.className =
+              "mt-2 text-xs font-medium text-emerald-600";
+
+            attendanceStatus.innerHTML =
+              `<i class="fa-solid fa-check mr-1"></i>
+       Above 75% Criteria`;
+
+          } else {
+
+            attendanceStatus.className =
+              "mt-2 text-xs font-medium text-rose-600";
+
+            attendanceStatus.innerHTML =
+              `<i class="fa-solid fa-triangle-exclamation mr-1"></i>
+       Below 75% Criteria`;
+          }
+        }
+
+
+        // ==================================
+        // 5. DISPLAY WEAK SUBJECT COUNT
+        // ==================================
+
+        document.getElementById(
+          "weak-subject-count"
+        ).textContent =
+          analysis.weak_subject_count;
+
+
+        // ==================================
+        // 6. DISPLAY ACADEMIC DIAGNOSIS
+        // ==================================
+
+        const diagnosis =
+          document.getElementById(
+            "academic-diagnosis"
+          );
+
+
+        let diagnosisText = "";
+
+
+        if (
+          analysis.academic_risk === "High"
+        ) {
+
+          diagnosisText =
+            `Academic risk is HIGH. ` +
+            `Your current CGPA is ${analysis.cgpa}, ` +
+            `while your target is ${analysis.target_cgpa}. ` +
+            `Immediate improvement in your academic performance is required.`;
+
+        }
+
+        else if (
+          analysis.academic_risk === "Moderate"
+        ) {
+
+          diagnosisText =
+            `Academic risk is MODERATE. ` +
+            `Focus on weak subjects and maintain ` +
+            `attendance above 75%.`;
+
+        }
+
+        else {
+
+          diagnosisText =
+            `Academic performance is currently LOW RISK. ` +
+            `Continue maintaining your current study routine.`;
+
+        }
+
+
+        diagnosis.innerHTML =
+          `<strong>AI Academic Diagnosis:</strong> ${diagnosisText}`;
+
+
+        // ==================================
+        // 7. DISPLAY CURRENT SEMESTER SUBJECTS
+        // ==================================
+        //
+        // IMPORTANT:
+        // Do NOT use /records here.
+        //
+        // analysis.subjects already contains the
+        // subjects filtered by the backend using:
+        //
+        // student_id
+        // current_semester
+        // academic_year
+        //
+        // ==================================
+
+        const subjectContainer =
+          document.getElementById("subject-cards");
+
+        subjectContainer.innerHTML = "";
+
+        const subjects =
+          Array.isArray(analysis.subjects)
+            ? analysis.subjects
+            : [];
+
+        console.log(
+          "CURRENT SEMESTER SUBJECTS:",
+          subjects
+        );
+
+        if (subjects.length === 0) {
+
+          subjectContainer.innerHTML = `
+    <div class="col-span-full rounded-xl border
+                border-slate-200 bg-slate-50 p-8
+                text-center text-slate-500">
+
+      No subjects found for
+      Semester ${analysis.current_semester}
+      (${analysis.academic_year}).
+
+    </div>
+  `;
+
+        } else {
+
+          subjects.forEach(record => {
+
+            const marks =
+              Number(record.marks);
+
+            const attendance =
+              Number(record.attendance_percent);
+
+            // ==================================
+            // SUBJECT STATUS
+            // ==================================
+
+            let status = "At Risk";
+
+            let statusClass =
+              "bg-rose-100 text-rose-600";
+
+
+            if (
+              marks >= 80 &&
+              attendance >= 75
+            ) {
+
+              status = "Excellent";
+
+              statusClass =
+                "bg-emerald-100 text-emerald-600";
+
+            }
+
+            else if (
+              marks >= 70 &&
+              attendance >= 75
+            ) {
+
+              status = "Good";
+
+              statusClass =
+                "bg-emerald-100 text-emerald-600";
+
+            }
+
+            else if (
+              marks >= 60 &&
+              attendance >= 75
+            ) {
+
+              status = "Average";
+
+              statusClass =
+                "bg-amber-100 text-amber-700";
+
+            }
+
+            else if (
+              attendance < 75
+            ) {
+
+              status = "Attendance Risk";
+
+              statusClass =
+                "bg-rose-100 text-rose-600";
+
+            }
+
+
+            // ==================================
+            // CREATE CARD
+            // ==================================
+
+            const card =
+              document.createElement("article");
+
+            card.className =
+              "rounded-lg border border-slate-200 bg-slate-50 p-4";
+
+
+            card.innerHTML = `
+
+      <div class="flex items-start justify-between gap-3">
+
+        <div>
+
+          <h3 class="text-sm font-semibold">
+            ${record.course_name || "Unnamed Subject"}
+          </h3>
+
+          <p class="mt-1 text-xs text-slate-500">
+            Code:
+            ${record.course_code || "--"}
+          </p>
+
+        </div>
+
+
+        <span
+          class="shrink-0 rounded px-2 py-1
+                 text-xs font-semibold ${statusClass}">
+          ${status}
+        </span>
+
+      </div>
+
+
+      <div class="mt-4 h-1.5 overflow-hidden
+                  rounded-full bg-slate-200">
+
+        <div
+          class="h-full rounded-full
+                 bg-gradient-to-r
+                 from-indigo-600 to-blue-400"
+          style="width: ${Math.max(
+              0,
+              Math.min(100, marks)
+            )}%">
+        </div>
+
+      </div>
+
+
+      <div class="mt-2 flex justify-between
+                  text-xs text-slate-500">
+
+        <span class="font-semibold text-slate-800">
+          ${marks}/100
+        </span>
+
+        <span>
+          Attendance:
+          ${attendance}%
+        </span>
+
+      </div>
+
+    `;
+
+
+            subjectContainer.appendChild(card);
+
+          });
+
+        }
+
+        // ==================================
+        // 9. DISPLAY RECOMMENDATIONS
+        // ==================================
+
+
+
+
+        // ==================================
+        console.log(
+          "Dashboard loaded successfully."
+        );
+
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Dashboard loading error:",
+          error
+        );
+
+
+        const diagnosis =
+          document.getElementById(
+            "academic-diagnosis"
+          );
+
+
+        if (diagnosis) {
+
+          diagnosis.innerHTML =
+            `<strong>Dashboard Error:</strong> ${error.message}`;
+
+        }
+
+      }
+
+    }
+
+
+    // Start dashboard
+    loadDashboard();
+    function renderRecommendations(recommendations) {
+
+      const container = document.getElementById(
+        "recommendation-cards"
+      );
+
+      if (!container) {
+        console.error(
+          "recommendation-cards element not found"
+        );
+        return;
+      }
+
+      if (
+        !recommendations ||
+        recommendations.length === 0
+      ) {
+
+        container.innerHTML = `
+            <div class="p-6 text-center text-slate-500">
+                No recommendations available.
+            </div>
+        `;
+
+        return;
+      }
+
+
+      container.innerHTML = recommendations
+        .map((item) => {
+
+          let icon = "💡";
+          let badge = "Recommendation";
+          let badgeClass =
+            "bg-indigo-100 text-indigo-700";
+
+
+          if (item.type === "attendance") {
+
+            icon = "📊";
+            badge = "Attendance";
+            badgeClass =
+              "bg-orange-100 text-orange-700";
+
+          }
+
+          else if (item.type === "academic") {
+
+            icon = "📚";
+            badge = "Academic";
+            badgeClass =
+              "bg-red-100 text-red-700";
+
+          }
+
+          else if (item.type === "cgpa") {
+
+            icon = "🎯";
+            badge = "CGPA";
+            badgeClass =
+              "bg-purple-100 text-purple-700";
+
+          }
+
+          else if (item.type === "course") {
+
+            icon = "🎓";
+            badge = "Course";
+            badgeClass =
+              "bg-emerald-100 text-emerald-700";
+          }
+
+
+          const prerequisites =
+            item.prerequisites || [];
+
+
+          return `
+                <div class="
+                    border border-slate-200
+                    rounded-xl
+                    p-5
+                    bg-white
+                    hover:shadow-md
+                    transition
+                ">
+
+                    <div class="
+                        flex
+                        items-start
+                        justify-between
+                        gap-4
+                    ">
+
+                        <div class="flex gap-3">
+
+                            <div class="
+                                w-10
+                                h-10
+                                rounded-lg
+                                bg-slate-100
+                                flex
+                                items-center
+                                justify-center
+                                text-lg
+                            ">
+                                ${icon}
+                            </div>
+
+                            <div>
+
+                                <span class="
+                                    inline-block
+                                    px-2
+                                    py-1
+                                    rounded-md
+                                    text-xs
+                                    font-semibold
+                                    ${badgeClass}
+                                ">
+                                    ${badge}
+                                </span>
+
+                                ${item.course_code
+              ? `
+                                        <h3 class="
+                                            mt-2
+                                            font-bold
+                                            text-slate-800
+                                        ">
+                                            ${item.course_code}
+                                            ${item.course_name
+                ? ` — ${item.course_name}`
+                : ""
+              }
+                                        </h3>
+                                    `
+              : ""
+            }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="
+                        mt-4
+                        text-sm
+                        text-slate-600
+                        leading-6
+                    ">
+                        ${item.message || ""}
+                    </p>
+
+
+                    ${prerequisites.length > 0
+              ? `
+                            <div class="mt-4">
+
+                                <p class="
+                                    text-xs
+                                    font-semibold
+                                    text-slate-500
+                                    uppercase
+                                    tracking-wide
+                                ">
+                                    Prerequisites
+                                </p>
+
+                                <div class="
+                                    flex
+                                    flex-wrap
+                                    gap-2
+                                    mt-2
+                                ">
+
+                                    ${prerequisites
+                .map(
+                  (p) => `
+                                                <span class="
+                                                    px-2
+                                                    py-1
+                                                    rounded-md
+                                                    bg-slate-100
+                                                    text-xs
+                                                    text-slate-700
+                                                ">
+                                                    ${p}
+                                                </span>
+                                            `
+                )
+                .join("")
+              }
+
+                                </div>
+
+                            </div>
+                        `
+              : ""
+            }
+
+                </div>
+            `;
+
+        })
+        .join("");
+    }
+    // ==========================================
+    // PROFILE PICTURE UPLOAD
+    // ==========================================
+
+    const profilePictureInput =
+      document.getElementById(
+        "profile-picture-input"
+      );
+
+    const profileUploadStatus =
+      document.getElementById(
+        "profile-upload-status"
+      );
+
+
+    if (profilePictureInput) {
+
+      profilePictureInput.addEventListener(
+        "change",
+        async function () {
+
+          const file =
+            profilePictureInput.files[0];
+
+
+          if (!file) {
+            return;
+          }
+
+
+          // ----------------------------------
+          // CHECK FILE TYPE
+          // ----------------------------------
+
+          const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+          ];
+
+
+          if (
+            !allowedTypes.includes(
+              file.type
+            )
+          ) {
+
+            profileUploadStatus.textContent =
+              "Only JPG, PNG or WEBP images are allowed.";
+
+            profileUploadStatus.className =
+              "mt-1 text-xs text-red-400";
+
+            return;
+          }
+
+
+          // ----------------------------------
+          // CHECK FILE SIZE
+          // ----------------------------------
+
+          if (
+            file.size >
+            5 * 1024 * 1024
+          ) {
+
+            profileUploadStatus.textContent =
+              "Image must be smaller than 5 MB.";
+
+            profileUploadStatus.className =
+              "mt-1 text-xs text-red-400";
+
+            return;
+          }
+
+
+          profileUploadStatus.textContent =
+            "Uploading...";
+
+          profileUploadStatus.className =
+            "mt-1 text-xs text-indigo-400";
+
+
+          // ----------------------------------
+          // CREATE FORM DATA
+          // ----------------------------------
+
+          const formData =
+            new FormData();
+
+          formData.append(
+            "file",
+            file
+          );
+
+
+          try {
+
+            const response =
+              await fetch(
+                `${API_URL}/auth/profile-picture/${STUDENT_ID}`,
+                {
+                  method: "POST",
+                  body: formData
+                }
+              );
+
+
+            const data =
+              await response.json();
+
+
+            if (
+              !response.ok ||
+              !data.success
+            ) {
+
+              throw new Error(
+                data.detail ||
+                data.error ||
+                "Upload failed."
+              );
+            }
+
+
+            // ----------------------------------
+            // UPDATE IMAGE IMMEDIATELY
+            // ----------------------------------
+
+            const imageUrl =
+              API_URL +
+              data.profile_picture +
+              "?t=" +
+              Date.now();
+
+
+            document
+              .querySelectorAll(
+                ".student-profile-image"
+              )
+              .forEach(
+                function (image) {
+
+                  image.src =
+                    imageUrl;
+
+                }
+              );
+
+
+            profileUploadStatus.textContent =
+              "Profile picture updated!";
+
+            profileUploadStatus.className =
+              "mt-1 text-xs text-green-400";
+
+
+          }
+          catch (error) {
+
+            console.error(
+              "Profile picture upload error:",
+              error
+            );
+
+
+            profileUploadStatus.textContent =
+              error.message;
+
+            profileUploadStatus.className =
+              "mt-1 text-xs text-red-400";
+
+          }
+
+        }
+      );
+
+    }
+    // =========================================================
+    // MOBILE PROFILE PICTURE UPLOAD
+    // =========================================================
+
+    const mobileProfilePictureButton =
+      document.getElementById(
+        "mobile-profile-picture-button"
+      );
+
+    const mobileProfilePictureInput =
+      document.getElementById(
+        "mobile-profile-picture-input"
+      );
+
+
+    // =========================================================
+    // CHECK ELEMENTS
+    // =========================================================
+
+    if (
+      mobileProfilePictureButton &&
+      mobileProfilePictureInput
+    ) {
+
+
+      // =======================================================
+      // OPEN PHONE IMAGE PICKER
+      // =======================================================
+
+      mobileProfilePictureButton.addEventListener(
+        "click",
+        function () {
+
+          mobileProfilePictureInput.click();
+
+        }
+      );
+
+
+      // =======================================================
+      // IMAGE SELECTED
+      // =======================================================
+
+      mobileProfilePictureInput.addEventListener(
+        "change",
+        async function () {
+
+          const file =
+            mobileProfilePictureInput.files[0];
+
+
+          if (!file) {
+
+            return;
+
+          }
+
+
+          // =====================================================
+          // VALID FILE TYPES
+          // =====================================================
+
+          const allowedTypes = [
+
+            "image/jpeg",
+
+            "image/png",
+
+            "image/webp"
+
+          ];
+
+
+          if (
+            !allowedTypes.includes(
+              file.type
+            )
+          ) {
+
+            alert(
+              "Only JPG, PNG or WEBP images are allowed."
+            );
+
+            mobileProfilePictureInput.value = "";
+
+            return;
+
+          }
+
+
+          // =====================================================
+          // FILE SIZE
+          // =====================================================
+
+          if (
+            file.size >
+            5 * 1024 * 1024
+          ) {
+
+            alert(
+              "Image must be smaller than 5 MB."
+            );
+
+            mobileProfilePictureInput.value = "";
+
+            return;
+
+          }
+
+
+          // =====================================================
+          // DISABLE BUTTON
+          // =====================================================
+
+          mobileProfilePictureButton.disabled =
+            true;
+
+
+          // =====================================================
+          // UPLOAD
+          // =====================================================
+
+          try {
+
+
+            const formData =
+              new FormData();
+
+
+            formData.append(
+              "file",
+              file
+            );
+
+
+            console.log(
+              "[Mobile Profile] Uploading..."
+            );
+
+
+            const response =
+              await fetch(
+
+                `${API_URL}/auth/profile-picture/${STUDENT_ID}`,
+
+                {
+
+                  method:
+                    "POST",
+
+                  body:
+                    formData
+
+                }
+
+              );
+
+
+            const data =
+              await response.json();
+
+
+            console.log(
+              "[Mobile Profile] Response:",
+              data
+            );
+
+
+            // ===================================================
+            // CHECK RESPONSE
+            // ===================================================
+
+            if (
+              !response.ok ||
+              !data.success
+            ) {
+
+              throw new Error(
+
+                data.detail ||
+                data.error ||
+                "Profile picture upload failed."
+
+              );
+
+            }
+
+
+            // ===================================================
+            // CREATE NEW IMAGE URL
+            // ===================================================
+
+            const imageUrl =
+
+              API_URL +
+
+              data.profile_picture +
+
+              "?t=" +
+
+              Date.now();
+
+
+            // ===================================================
+            // UPDATE ALL PROFILE IMAGES
+            // ===================================================
+
+            document
+              .querySelectorAll(
+                ".student-profile-image"
+              )
+              .forEach(
+                function (image) {
+
+                  image.src =
+                    imageUrl;
+
+                }
+              );
+
+
+            // ===================================================
+            // SUCCESS
+            // ===================================================
+
+            console.log(
+              "[Mobile Profile] Profile picture updated successfully."
+            );
+
+
+            // Small visual feedback
+
+            mobileProfilePictureButton.classList.add(
+              "ring-2",
+              "ring-green-400"
+            );
+
+
+            setTimeout(
+              function () {
+
+                mobileProfilePictureButton.classList.remove(
+                  "ring-2",
+                  "ring-green-400"
+                );
+
+              },
+              1500
+            );
+
+
+          }
+
+          catch (error) {
+
+
+            console.error(
+              "[Mobile Profile] Upload error:",
+              error
+            );
+
+
+            alert(
+
+              error.message ||
+
+              "Unable to update profile picture."
+
+            );
+
+          }
+
+
+          finally {
+
+
+            mobileProfilePictureButton.disabled =
+              false;
+
+
+            mobileProfilePictureInput.value =
+              "";
+
+          }
+
+        }
+      );
+
+    }
+  </script>
+</body>
+
+</html>

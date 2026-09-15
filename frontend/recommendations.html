@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AcadAI Advisor — Recommendations</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900">
+
+    <div class="min-h-screen lg:flex">
+
+
+        <!-- SIDEBAR -->
+        <aside class="hidden w-64 shrink-0 flex-col justify-between
+        bg-slate-950 px-4 py-6 text-slate-300
+        lg:fixed lg:inset-y-0 lg:left-0 lg:flex">
+
+            <div>
+
+                <!-- LOGO -->
+                <a href="dashboard.html" class="flex items-center gap-3 border-b
+                border-slate-800 pb-6 text-white">
+
+                    <span class="grid h-10 w-10 place-items-center
+                    rounded-xl bg-indigo-600 text-lg">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </span>
+
+                    <span class="text-lg font-bold">
+                        AcadAI Advisor
+                    </span>
+
+                </a>
+
+
+                <!-- NAVIGATION -->
+                <nav class="mt-6 space-y-1">
+
+                    <a href="dashboard.html" class="flex items-center gap-3 rounded-lg
+                    px-3.5 py-3 text-sm font-medium
+                    hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                        Dashboard
+                    </a>
+
+
+                    <!-- <a href="dashboard.html#subjects" class="flex items-center gap-3 rounded-lg
+                    px-3.5 py-3 text-sm font-medium
+                    hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-book-open w-5 text-center"></i>
+                        Subjects & Marks
+                    </a> -->
+
+
+                    <a href="#" class="flex items-center gap-3 rounded-lg
+                    px-3.5 py-3 text-sm font-medium
+                    hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-user-check w-5 text-center"></i>
+                        Attendance
+                    </a>
+
+
+                    <a href="study-plan.html" class="flex items-center gap-3 rounded-lg
+                    px-3.5 py-3 text-sm font-medium
+                    hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-calendar-check w-5 text-center"></i>
+                        Study Plan
+                    </a>
+
+                    <a href="quiz.html"
+                        class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+                            class="fa-solid fa-calendar-check w-5 text-center"></i>Quizes</a>
+
+
+                    <!-- ACTIVE -->
+                    <a href="recommendations.html" class="flex items-center gap-3 rounded-lg
+                    bg-indigo-600 px-3.5 py-3
+                    text-sm font-semibold text-white">
+                        <i class="fa-solid fa-compass w-5 text-center"></i>
+                        Recommendations
+                    </a>
+
+
+                    <a href="#" class="flex items-center gap-3 rounded-lg
+                    px-3.5 py-3 text-sm font-medium
+                    hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-robot w-5 text-center"></i>
+                        AI Chatbot
+                    </a>
+
+                    <a href="feedback.html"
+            class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+              class="fa-solid fa-calendar-check w-5 text-center"></i>Feedback</a>
+
+                </nav>
+
+            </div>
+
+
+            <!-- USER -->
+            <div class="border-t border-slate-800 pt-4">
+
+                <div class="flex items-center gap-3">
+
+                    <img id="student-profile-image"
+                        class="student-profile-image h-10 w-10 rounded-full border-2 border-indigo-500 object-cover"
+                        src="https://ui-avatars.com/api/?name=Student&background=e0e7ff&color=4f46e5&size=128"
+                        alt="Student Profile">
+
+                    <div class="min-w-0">
+
+                        <p id="sidebar-student-name" class="truncate text-sm font-semibold text-white">
+                            Student
+                        </p>
+
+                        <p id="sidebar-student-id" class="truncate text-xs text-slate-500">
+                            --
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <button type="button" onclick="logout()" class="mt-3 w-full rounded-lg
+        border border-slate-700
+        px-3 py-2
+        text-xs font-semibold
+        text-slate-300
+        transition
+        hover:bg-slate-800
+        hover:text-white">
+
+                    <i class="fa-solid fa-right-from-bracket mr-2"></i>
+
+                    Logout
+
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN -->
+        <div class="flex min-w-0 flex-1 flex-col lg:ml-64">
+
+
+            <!-- HEADER -->
+            <header class="sticky top-0 z-20
+            border-b border-slate-200
+            bg-white/95 backdrop-blur">
+
+                <div class="flex min-h-16 items-center
+                justify-between gap-3
+                px-4 py-3 sm:px-6 lg:px-8">
+
+                    <div>
+
+                        <h1 class="text-base font-bold sm:text-lg">
+                            AI Academic Recommendations
+                        </h1>
+
+                        <p class="mt-1 text-xs text-slate-500">
+                            Personalized recommendations based on your academic profile
+                        </p>
+
+                    </div>
+
+
+                    <a href="dashboard.html" class="rounded-lg border border-indigo-200
+                    bg-indigo-50 px-4 py-2
+                    text-xs font-semibold text-indigo-700
+                    hover:bg-indigo-100">
+                        <i class="fa-solid fa-arrow-left mr-1"></i>
+                        Dashboard
+                    </a>
+
+                </div>
+
+            </header>
+
+
+            <!-- CONTENT -->
+            <main class="mx-auto w-full max-w-screen-2xl
+            flex-1 space-y-6 p-4 sm:p-6 lg:p-8">
+
+
+                <!-- TITLE -->
+                <section>
+
+                    <h2 class="text-2xl font-bold tracking-tight">
+                        Recommendations
+                    </h2>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                        Actionable suggestions generated from your academic data.
+                    </p>
+
+                </section>
+
+
+                <!-- PROFILE SUMMARY -->
+                <section class="grid gap-4
+                sm:grid-cols-2 lg:grid-cols-4">
+
+                    <article class="rounded-xl border border-slate-200
+                    bg-white p-5 shadow-sm">
+
+                        <p class="text-xs font-semibold uppercase
+                        tracking-wide text-slate-500">
+                            Current CGPA
+                        </p>
+
+                        <p id="cgpa" class="mt-2 text-3xl font-bold">
+                            --
+                        </p>
+
+                    </article>
+
+
+                    <article class="rounded-xl border border-slate-200
+                    bg-white p-5 shadow-sm">
+
+                        <p class="text-xs font-semibold uppercase
+                        tracking-wide text-slate-500">
+                            Target CGPA
+                        </p>
+
+                        <p id="target-cgpa" class="mt-2 text-3xl font-bold">
+                            --
+                        </p>
+
+                    </article>
+
+
+                    <article class="rounded-xl border border-slate-200
+                    bg-white p-5 shadow-sm">
+
+                        <p class="text-xs font-semibold uppercase
+                        tracking-wide text-slate-500">
+                            Academic Risk
+                        </p>
+
+                        <p id="risk" class="mt-2 text-2xl font-bold">
+                            --
+                        </p>
+
+                    </article>
+
+
+                    <article class="rounded-xl border border-slate-200
+                    bg-white p-5 shadow-sm">
+
+                        <p class="text-xs font-semibold uppercase
+                        tracking-wide text-slate-500">
+                            Career Match
+                        </p>
+
+                        <p id="career" class="mt-2 text-lg font-bold">
+                            --
+                        </p>
+
+                        <p id="career-percentage" class="mt-1 text-xs text-slate-500">
+                            --
+                        </p>
+
+                    </article>
+
+                </section>
+
+
+                <!-- LOADING -->
+                <section id="loading" class="rounded-xl border border-slate-200
+                bg-white p-10 text-center">
+
+                    <i class="fa-solid fa-spinner fa-spin
+                    text-2xl text-indigo-600"></i>
+
+                    <p class="mt-3 text-sm text-slate-500">
+                        Loading AI recommendations...
+                    </p>
+
+                </section>
+
+
+                <!-- RECOMMENDATIONS -->
+                <section id="recommendation-section" class="hidden">
+
+                    <div class="rounded-xl border border-slate-200
+                    bg-white p-5 shadow-sm">
+
+                        <div class="mb-5">
+
+                            <h3 class="text-lg font-bold">
+                                Personalized Recommendations
+                            </h3>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                Follow these recommendations to improve your academic performance.
+                            </p>
+
+                        </div>
+
+
+                        <div id="recommendation-cards" class="grid gap-4
+                        md:grid-cols-2 xl:grid-cols-3"></div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- CAREER MATCH -->
+                <section id="career-section" class="hidden">
+
+                    <div class="rounded-xl border border-slate-200
+                    bg-white p-6 shadow-sm">
+
+                        <div class="flex items-start gap-4">
+
+                            <div class="grid h-12 w-12 shrink-0
+                            place-items-center rounded-xl
+                            bg-amber-50 text-xl text-amber-600">
+                                <i class="fa-solid fa-bullseye"></i>
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="text-lg font-bold">
+                                    Target Career Match
+                                </h3>
+
+                                <p id="career-message" class="mt-1 text-sm text-slate-600">
+                                    --
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mt-6">
+
+                            <div class="mb-2 flex justify-between
+                            text-xs font-medium">
+
+                                <span>
+                                    Career compatibility
+                                </span>
+
+                                <span id="career-bar-text">
+                                    0%
+                                </span>
+
+                            </div>
+
+
+                            <div class="h-3 overflow-hidden
+                            rounded-full bg-slate-200">
+
+                                <div id="career-bar" class="h-full rounded-full
+                                bg-indigo-600" style="width:0%"></div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mt-6">
+
+                            <p class="mb-3 text-xs font-semibold
+                            uppercase tracking-wide
+                            text-slate-500">
+                                Matched Courses
+                            </p>
+
+                            <div id="matched-courses" class="flex flex-wrap gap-2"></div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ERROR -->
+                <section id="error-box" class="hidden rounded-xl
+                border border-red-200
+                bg-red-50 p-5 text-red-700">
+
+                    <div class="flex gap-3">
+
+                        <i class="fa-solid fa-circle-exclamation mt-1"></i>
+
+                        <div>
+
+                            <h3 class="font-semibold">
+                                Unable to load recommendations
+                            </h3>
+
+                            <p id="error-message" class="mt-1 text-sm"></p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+        </div>
+
+    </div>
+
+
+    <script src="js/auth.js"></script>
+
+    <script>
+
+        requireLogin();
+
+
+
+        async function loadRecommendations() {
+
+            await loadStudentProfile(API_URL);
+
+            try {
+
+                const response = await fetch(
+                    `${API_URL}/students/${STUDENT_ID}/analysis`
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `Analysis API returned ${response.status}`
+                    );
+
+                }
+
+
+                const data = await response.json();
+
+                console.log("Analysis data:", data);
+
+
+                if (data.error) {
+
+                    throw new Error(data.error);
+
+                }
+
+
+                // =========================
+                // PROFILE
+                // =========================
+
+                document.getElementById("cgpa").textContent =
+                    data.cgpa;
+
+
+                document.getElementById("target-cgpa").textContent =
+                    data.target_cgpa;
+
+
+                document.getElementById("risk").textContent =
+                    data.academic_risk;
+
+
+                // =========================
+                // CAREER
+                // =========================
+
+                if (data.career_match) {
+
+                    const career =
+                        data.career_match;
+
+
+                    document.getElementById("career").textContent =
+                        career.career;
+
+
+                    document.getElementById(
+                        "career-percentage"
+                    ).textContent =
+                        `${career.match_percentage}% match`;
+
+
+                    document.getElementById(
+                        "career-message"
+                    ).textContent =
+                        career.message;
+
+
+                    document.getElementById(
+                        "career-bar-text"
+                    ).textContent =
+                        `${career.match_percentage}%`;
+
+
+                    document.getElementById(
+                        "career-bar"
+                    ).style.width =
+                        `${career.match_percentage}%`;
+
+
+                    const matchedCourses =
+                        document.getElementById(
+                            "matched-courses"
+                        );
+
+
+                    matchedCourses.innerHTML =
+                        career.matched_courses
+                            .map(course => `
+                        <span
+                            class="rounded-lg
+                            bg-slate-100 px-3 py-2
+                            text-xs font-semibold
+                            text-slate-700"
+                        >
+                            ${course}
+                        </span>
+                    `)
+                            .join("");
+
+
+                    document.getElementById(
+                        "career-section"
+                    ).classList.remove("hidden");
+
+                }
+
+
+                // =========================
+                // RECOMMENDATIONS
+                // =========================
+
+                const recommendations =
+                    data.recommendations || [];
+
+
+                const container =
+                    document.getElementById(
+                        "recommendation-cards"
+                    );
+
+
+                container.innerHTML =
+                    recommendations.map(
+                        (recommendation, index) => {
+
+                            let icon =
+                                "fa-lightbulb";
+
+
+                            let badge =
+                                "Academic";
+
+
+                            let badgeClass =
+                                "bg-indigo-100 text-indigo-700";
+
+
+                            if (
+                                recommendation.type ===
+                                "attendance"
+                            ) {
+
+                                icon =
+                                    "fa-user-check";
+
+                                badge =
+                                    "Attendance";
+
+                                badgeClass =
+                                    "bg-orange-100 text-orange-700";
+
+                            }
+
+
+                            else if (
+                                recommendation.type ===
+                                "cgpa"
+                            ) {
+
+                                icon =
+                                    "fa-chart-line";
+
+                                badge =
+                                    "CGPA";
+
+                                badgeClass =
+                                    "bg-purple-100 text-purple-700";
+
+                            }
+
+
+                            else if (
+                                recommendation.type ===
+                                "course"
+                            ) {
+
+                                icon =
+                                    "fa-graduation-cap";
+
+                                badge =
+                                    "Course";
+
+                                badgeClass =
+                                    "bg-emerald-100 text-emerald-700";
+
+                            }
+
+
+                            return `
+
+                        <article
+                            class="rounded-xl
+                            border border-slate-200
+                            bg-slate-50 p-5
+                            transition hover:shadow-md"
+                        >
+
+                            <div
+                                class="flex items-start
+                                justify-between gap-3"
+                            >
+
+                                <span
+                                    class="grid h-11 w-11
+                                    place-items-center
+                                    rounded-xl
+                                    bg-white
+                                    text-indigo-600
+                                    shadow-sm"
+                                >
+                                    <i
+                                        class="fa-solid
+                                        ${icon}"
+                                    ></i>
+                                </span>
+
+
+                                <span
+                                    class="rounded-full
+                                    px-2.5 py-1
+                                    text-xs font-semibold
+                                    ${badgeClass}"
+                                >
+                                    ${badge}
+                                </span>
+
+                            </div>
+
+
+                            <h4
+                                class="mt-4
+                                text-base font-bold"
+                            >
+                                ${recommendation.course_name
+                                || recommendation.course_code
+                                || "Academic Recommendation"}
+                            </h4>
+
+
+                            ${recommendation.course_code
+                                    ? `
+                                    <p
+                                        class="mt-1
+                                        text-xs font-semibold
+                                        text-slate-500"
+                                    >
+                                        ${recommendation.course_code}
+                                    </p>
+                                  `
+                                    : ""
+                                }
+
+
+                            <p
+                                class="mt-3 text-sm
+                                leading-6
+                                text-slate-600"
+                            >
+                                ${recommendation.message}
+                            </p>
+
+
+                            ${recommendation.prerequisites
+                                    ? `
+                                    <div class="mt-4">
+
+                                        <p
+                                            class="text-xs
+                                            font-semibold
+                                            uppercase
+                                            tracking-wide
+                                            text-slate-500"
+                                        >
+                                            Prerequisites
+                                        </p>
+
+                                        <div
+                                            class="mt-2
+                                            flex flex-wrap gap-2"
+                                        >
+
+                                            ${recommendation
+                                        .prerequisites
+                                        .map(
+                                            prerequisite => `
+                                                            <span
+                                                                class="rounded-md
+                                                                bg-white
+                                                                px-2.5 py-1
+                                                                text-xs
+                                                                font-medium
+                                                                text-slate-600"
+                                                            >
+                                                                ${prerequisite}
+                                                            </span>
+                                                        `
+                                        )
+                                        .join("")
+                                    }
+
+                                        </div>
+
+                                    </div>
+                                  `
+                                    : ""
+                                }
+
+                        </article>
+
+                    `;
+
+                        }
+                    ).join("");
+
+
+                // SHOW PAGE
+                document
+                    .getElementById("loading")
+                    .classList.add("hidden");
+
+
+                document
+                    .getElementById("recommendation-section")
+                    .classList.remove("hidden");
+
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Recommendation error:",
+                    error
+                );
+
+
+                document
+                    .getElementById("loading")
+                    .classList.add("hidden");
+
+
+                document
+                    .getElementById("error-box")
+                    .classList.remove("hidden");
+
+
+                document
+                    .getElementById("error-message")
+                    .textContent =
+                    error.message;
+
+            }
+
+        }
+
+
+        loadRecommendations();
+
+    </script>
+
+</body>
+
+</html>

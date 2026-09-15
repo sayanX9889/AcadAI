@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AcadAI Advisor — Login</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+
+<body class="min-h-screen bg-slate-50 font-sans">
+
+    <div class="flex min-h-screen items-center justify-center p-4">
+
+
+        <div class="grid w-full max-w-4xl overflow-hidden
+        rounded-2xl border border-slate-200
+        bg-white shadow-xl md:grid-cols-2">
+
+
+            <!-- LEFT -->
+
+            <div class="hidden bg-slate-950 p-10
+            text-white md:flex md:flex-col
+            md:justify-between">
+
+                <div>
+
+                    <div class="flex items-center gap-3">
+
+                        <span class="grid h-11 w-11
+                        place-items-center rounded-xl
+                        bg-indigo-600">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </span>
+
+                        <span class="text-xl font-bold">
+                            AcadAI Advisor
+                        </span>
+
+                    </div>
+
+
+                    <h1 class="mt-16 text-4xl
+                    font-bold leading-tight">
+                        Your Personal
+                        <span class="text-indigo-400">
+                            Academic Advisor
+                        </span>
+                    </h1>
+
+
+                    <p class="mt-5 text-sm
+                    leading-6 text-slate-400">
+                        Analyze your academic performance,
+                        attendance, study plan, career match,
+                        and course recommendations in one place.
+                    </p>
+
+                </div>
+
+
+                <p class="text-xs text-slate-500">
+                    AI Academic Advisor © 2026
+                </p>
+
+            </div>
+
+
+            <!-- RIGHT -->
+
+            <div class="p-6 sm:p-10">
+
+
+                <div class="mb-8">
+
+                    <h2 class="text-2xl
+                    font-bold text-slate-900">
+                        Welcome back
+                    </h2>
+
+                    <p class="mt-2 text-sm
+                    text-slate-500">
+                        Sign in to access your academic dashboard.
+                    </p>
+
+                </div>
+
+
+                <!-- LOGIN FORM -->
+
+                <form id="login-form" class="space-y-5">
+
+
+                    <!-- STUDENT ID -->
+
+                    <div>
+
+                        <label for="student-id" class="mb-2 block text-sm
+                        font-semibold text-slate-700">
+                            Student ID
+                        </label>
+
+                        <input id="student-id" type="text" placeholder="e.g. STU0001" required class="w-full rounded-xl
+                        border border-slate-300
+                        px-4 py-3 text-sm
+                        outline-none
+                        focus:border-indigo-500
+                        focus:ring-2
+                        focus:ring-indigo-100">
+
+                    </div>
+
+
+                    <!-- PASSWORD -->
+
+                    <div>
+
+                        <label for="password" class="mb-2 block text-sm
+                        font-semibold text-slate-700">
+                            Password
+                        </label>
+
+                        <div class="relative">
+                            <input id="password" type="password" placeholder="Enter password" required class="w-full rounded-xl
+                            border border-slate-300
+                            px-4 py-3 text-sm pr-12
+                            outline-none
+                            focus:border-indigo-500
+                            focus:ring-2
+                            focus:ring-indigo-100">
+                            <button type="button"
+                                onclick="togglePassword('password', 'password-eye')"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                aria-label="Show password">
+                                <i id="password-eye" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+
+                    <!-- ERROR -->
+
+                    <div id="error-message" class="hidden rounded-lg
+                    border border-red-200
+                    bg-red-50 p-3
+                    text-sm text-red-700"></div>
+
+
+                    <!-- BUTTON -->
+
+                    <button type="submit" class="w-full rounded-xl
+                    bg-indigo-600 px-4 py-3
+                    text-sm font-semibold
+                    text-white
+                    transition hover:bg-indigo-700">
+
+                        <i class="fa-solid fa-right-to-bracket mr-2"></i>
+
+                        Sign In
+
+                    </button>
+
+                </form>
+
+
+                <div class="mt-6 border-t border-slate-200 pt-5 text-center">
+
+                    <span class="text-sm text-slate-500">
+                        Don't have an account?
+                    </span>
+
+                    <a href="signup.html" class="ml-1 text-sm font-semibold
+        text-indigo-600 hover:text-indigo-700">
+                        Create an account
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const API_URL =
+            "http://127.0.0.1:8000";
+
+
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+
+
+
+        document
+            .getElementById("login-form")
+            .addEventListener(
+                "submit",
+                async function (event) {
+
+                    event.preventDefault();
+
+
+                    const studentId =
+                        document
+                            .getElementById("student-id")
+                            .value
+                            .trim()
+                            .toUpperCase();
+
+
+                    const password =
+                        document
+                            .getElementById("password")
+                            .value;
+
+
+                    const errorMessage =
+                        document.getElementById(
+                            "error-message"
+                        );
+
+
+                    const button =
+                        event.submitter;
+
+
+                    errorMessage.classList.add(
+                        "hidden"
+                    );
+
+
+                    if (!studentId || !password) {
+
+                        errorMessage.textContent =
+                            "Enter both Student ID and password.";
+
+                        errorMessage.classList.remove(
+                            "hidden"
+                        );
+
+                        return;
+                    }
+
+
+                    button.disabled = true;
+
+                    button.innerHTML =
+                        '<i class="fa-solid fa-spinner fa-spin mr-2"></i>' +
+                        'Signing In...';
+
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                `${API_URL}/auth/login`,
+                                {
+                                    method: "POST",
+
+                                    headers: {
+                                        "Content-Type":
+                                            "application/json"
+                                    },
+
+                                    body: JSON.stringify({
+                                        student_id: studentId,
+                                        password: password
+                                    })
+                                }
+                            );
+
+
+                        const data =
+                            await response.json();
+
+
+                        if (!response.ok || !data.success) {
+
+                            throw new Error(
+                                data.error ||
+                                "Invalid Student ID or password."
+                            );
+                        }
+
+
+                        // -----------------------------------------
+                        // SAVE LOGGED-IN STUDENT
+                        // -----------------------------------------
+
+                        localStorage.setItem(
+                            "student_id",
+                            data.student.student_id
+                        );
+
+
+                        localStorage.setItem(
+                            "student_name",
+                            data.student.full_name
+                        );
+
+
+                        localStorage.setItem(
+                            "student_email",
+                            data.student.email
+                        );
+
+
+                        // -----------------------------------------
+                        // REDIRECT
+                        // -----------------------------------------
+
+                        window.location.href =
+                            "dashboard.html";
+
+
+                    }
+                    catch (error) {
+
+                        errorMessage.textContent =
+                            error.message;
+
+                        errorMessage.classList.remove(
+                            "hidden"
+                        );
+
+                    }
+                    finally {
+
+                        button.disabled = false;
+
+                        button.innerHTML =
+                            '<i class="fa-solid fa-right-to-bracket mr-2"></i>' +
+                            'Sign In';
+
+                    }
+
+                }
+            );
+
+    </script>
+
+</body>
+
+</html>

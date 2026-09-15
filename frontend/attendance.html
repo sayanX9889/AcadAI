@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AcadAI Advisor — Attendance</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900">
+
+    <div class="min-h-screen lg:flex">
+
+
+        <!-- ========================= -->
+        <!-- SIDEBAR -->
+        <!-- ========================= -->
+
+        <aside class="hidden w-64 shrink-0 flex-col justify-between
+        bg-slate-950 px-4 py-6 text-slate-300
+        lg:fixed lg:inset-y-0 lg:left-0 lg:flex">
+
+            <div>
+
+                <!-- LOGO -->
+                <a href="dashboard.html" class="flex items-center gap-3
+                border-b border-slate-800 pb-6 text-white">
+
+                    <span class="grid h-10 w-10 place-items-center
+                    rounded-xl bg-indigo-600 text-lg">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </span>
+
+                    <span class="text-lg font-bold">
+                        AcadAI Advisor
+                    </span>
+
+                </a>
+
+
+                <!-- NAVIGATION -->
+                <nav class="mt-6 space-y-1">
+
+                    <a href="dashboard.html" class="flex items-center gap-3 rounded-lg
+                    px-3.5 py-3 text-sm font-medium
+                    hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                        Dashboard
+                    </a>
+
+
+                    <!-- <a href="dashboard.html#subjects" class="flex items-center gap-3 rounded-lg
+                    px-3.5 py-3 text-sm font-medium
+                    hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-book-open w-5 text-center"></i>
+                        Subjects & Marks
+                    </a> -->
+
+
+                    <!-- ACTIVE -->
+                    <a href="attendance.html" class="flex items-center gap-3 rounded-lg
+                    bg-indigo-600 px-3.5 py-3
+                    text-sm font-semibold text-white">
+                        <i class="fa-solid fa-user-check w-5 text-center"></i>
+                        Attendance
+                    </a>
+
+
+                    <a href="study-plan.html" class="flex items-center gap-3 rounded-lg
+                    px-3.5 py-3 text-sm font-medium
+                    hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-calendar-check w-5 text-center"></i>
+                        Study Plan
+                    </a>
+
+                    <a href="quiz.html"
+                        class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+                            class="fa-solid fa-calendar-check w-5 text-center"></i>Quizes</a>
+
+
+                    <a href="recommendations.html" class="flex items-center gap-3 rounded-lg
+                    px-3.5 py-3 text-sm font-medium
+                    hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-compass w-5 text-center"></i>
+                        Recommendations
+                    </a>
+
+
+                    <a href="#" class="flex items-center gap-3 rounded-lg
+                    px-3.5 py-3 text-sm font-medium
+                    hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-robot w-5 text-center"></i>
+                        AI Chatbot
+                    </a>
+
+                    <a href="feedback.html"
+            class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+              class="fa-solid fa-calendar-check w-5 text-center"></i>Feedback</a>
+
+                </nav>
+
+            </div>
+
+
+            <!-- USER -->
+            <div class="border-t border-slate-800 pt-4">
+
+                <div class="flex items-center gap-3">
+
+
+                    <img id="student-profile-image"
+                        class="student-profile-image h-10 w-10 rounded-full border-2 border-indigo-500 object-cover"
+                        src="https://ui-avatars.com/api/?name=Student&background=e0e7ff&color=4f46e5&size=128"
+                        alt="Student Profile">
+
+                    <div class="min-w-0">
+
+                        <p id="sidebar-student-name" class="truncate text-sm font-semibold text-white">
+                            Student
+                        </p>
+
+                        <p id="sidebar-student-id" class="truncate text-xs text-slate-500">
+                            --
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <button type="button" onclick="logout()" class="mt-3 w-full rounded-lg
+        border border-slate-700
+        px-3 py-2
+        text-xs font-semibold
+        text-slate-300
+        transition
+        hover:bg-slate-800
+        hover:text-white">
+
+                    <i class="fa-solid fa-right-from-bracket mr-2"></i>
+
+                    Logout
+
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ========================= -->
+        <!-- MAIN -->
+        <!-- ========================= -->
+
+        <div class="flex min-w-0 flex-1 flex-col lg:ml-64">
+
+
+            <!-- HEADER -->
+            <header class="sticky top-0 z-20
+            border-b border-slate-200
+            bg-white/95 backdrop-blur">
+
+                <div class="flex min-h-16 items-center
+                justify-between gap-3
+                px-4 py-3 sm:px-6 lg:px-8">
+
+                    <div>
+
+                        <h1 class="text-base font-bold sm:text-lg">
+                            Attendance
+                        </h1>
+
+                        <p class="mt-1 text-xs text-slate-500">
+                            Monitor your subject-wise attendance
+                        </p>
+
+                    </div>
+
+
+                    <a href="dashboard.html" class="rounded-lg border border-indigo-200
+                    bg-indigo-50 px-4 py-2
+                    text-xs font-semibold text-indigo-700
+                    hover:bg-indigo-100">
+                        <i class="fa-solid fa-arrow-left mr-1"></i>
+                        Dashboard
+                    </a>
+
+                </div>
+
+            </header>
+
+
+            <!-- ========================= -->
+            <!-- CONTENT -->
+            <!-- ========================= -->
+
+            <main class="mx-auto w-full max-w-screen-2xl
+            flex-1 space-y-6
+            p-4 sm:p-6 lg:p-8">
+
+
+                <!-- TITLE -->
+                <section>
+
+                    <h2 class="text-2xl font-bold tracking-tight">
+                        Attendance Overview
+                    </h2>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                        Track attendance and identify subjects that need immediate attention.
+                    </p>
+
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- SUMMARY CARDS -->
+                <!-- ========================= -->
+
+                <section class="grid gap-4
+                sm:grid-cols-2 lg:grid-cols-4">
+
+
+                    <!-- AVERAGE -->
+                    <article class="rounded-xl border border-slate-200
+                    bg-white p-5 shadow-sm">
+
+                        <div class="flex items-center
+                        justify-between">
+
+                            <div>
+
+                                <p class="text-xs font-semibold
+                                uppercase tracking-wide
+                                text-slate-500">
+                                    Average Attendance
+                                </p>
+
+                                <p id="average-attendance" class="mt-2 text-3xl font-bold">
+                                    --
+                                </p>
+
+                            </div>
+
+                            <span class="grid h-12 w-12
+                            place-items-center
+                            rounded-xl bg-indigo-50
+                            text-xl text-indigo-600">
+                                <i class="fa-solid fa-chart-pie"></i>
+                            </span>
+
+                        </div>
+
+                    </article>
+
+
+                    <!-- TOTAL SUBJECTS -->
+                    <article class="rounded-xl border border-slate-200
+                    bg-white p-5 shadow-sm">
+
+                        <div class="flex items-center
+                        justify-between">
+
+                            <div>
+
+                                <p class="text-xs font-semibold
+                                uppercase tracking-wide
+                                text-slate-500">
+                                    Total Subjects
+                                </p>
+
+                                <p id="total-subjects" class="mt-2 text-3xl font-bold">
+                                    --
+                                </p>
+
+                            </div>
+
+                            <span class="grid h-12 w-12
+                            place-items-center
+                            rounded-xl bg-emerald-50
+                            text-xl text-emerald-600">
+                                <i class="fa-solid fa-book"></i>
+                            </span>
+
+                        </div>
+
+                    </article>
+
+
+                    <!-- SAFE -->
+                    <article class="rounded-xl border border-slate-200
+                    bg-white p-5 shadow-sm">
+
+                        <div class="flex items-center
+                        justify-between">
+
+                            <div>
+
+                                <p class="text-xs font-semibold
+                                uppercase tracking-wide
+                                text-slate-500">
+                                    Safe Subjects
+                                </p>
+
+                                <p id="safe-subjects" class="mt-2 text-3xl font-bold">
+                                    --
+                                </p>
+
+                                <p class="mt-1 text-xs text-slate-500">
+                                    75% or above
+                                </p>
+
+                            </div>
+
+                            <span class="grid h-12 w-12
+                            place-items-center
+                            rounded-xl bg-green-50
+                            text-xl text-green-600">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </span>
+
+                        </div>
+
+                    </article>
+
+
+                    <!-- AT RISK -->
+                    <article class="rounded-xl border border-slate-200
+                    bg-white p-5 shadow-sm">
+
+                        <div class="flex items-center
+                        justify-between">
+
+                            <div>
+
+                                <p class="text-xs font-semibold
+                                uppercase tracking-wide
+                                text-slate-500">
+                                    At Risk
+                                </p>
+
+                                <p id="risk-subjects" class="mt-2 text-3xl font-bold">
+                                    --
+                                </p>
+
+                                <p class="mt-1 text-xs text-slate-500">
+                                    Below 75%
+                                </p>
+
+                            </div>
+
+                            <span class="grid h-12 w-12
+                            place-items-center
+                            rounded-xl bg-red-50
+                            text-xl text-red-600">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- LOADING -->
+                <!-- ========================= -->
+
+                <section id="loading" class="rounded-xl border border-slate-200
+                bg-white p-10 text-center">
+
+                    <i class="fa-solid fa-spinner fa-spin
+                    text-2xl text-indigo-600"></i>
+
+                    <p class="mt-3 text-sm text-slate-500">
+                        Loading attendance data...
+                    </p>
+
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- SUBJECT TABLE -->
+                <!-- ========================= -->
+
+                <section id="attendance-section" class="hidden rounded-xl
+                border border-slate-200
+                bg-white shadow-sm">
+
+                    <div class="border-b border-slate-200
+                    p-5">
+
+                        <h3 class="text-lg font-bold">
+                            Subject-wise Attendance
+                        </h3>
+
+                        <p class="mt-1 text-xs text-slate-500">
+                            Attendance below 75% requires immediate attention.
+                        </p>
+
+                    </div>
+
+
+                    <!-- DESKTOP TABLE -->
+                    <div class="hidden overflow-x-auto md:block">
+
+                        <table class="w-full text-left">
+
+                            <thead class="border-b border-slate-200
+                            bg-slate-50">
+
+                                <tr>
+
+                                    <th class="px-5 py-4
+                                    text-xs font-semibold
+                                    uppercase tracking-wide
+                                    text-slate-500">
+                                        Course
+                                    </th>
+
+                                    <th class="px-5 py-4
+                                    text-xs font-semibold
+                                    uppercase tracking-wide
+                                    text-slate-500">
+                                        Attendance
+                                    </th>
+
+                                    <th class="px-5 py-4
+                                    text-xs font-semibold
+                                    uppercase tracking-wide
+                                    text-slate-500">
+                                        Status
+                                    </th>
+
+                                    <th class="px-5 py-4
+                                    text-xs font-semibold
+                                    uppercase tracking-wide
+                                    text-slate-500">
+                                        Progress
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="attendance-table" class="divide-y divide-slate-100"></tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <!-- MOBILE CARDS -->
+                    <div id="attendance-mobile" class="space-y-3 p-4 md:hidden"></div>
+
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- ERROR -->
+                <!-- ========================= -->
+
+                <section id="error-box" class="hidden rounded-xl
+                border border-red-200
+                bg-red-50 p-5 text-red-700">
+
+                    <div class="flex gap-3">
+
+                        <i class="fa-solid
+                        fa-circle-exclamation mt-1"></i>
+
+                        <div>
+
+                            <h3 class="font-semibold">
+                                Unable to load attendance
+                            </h3>
+
+                            <p id="error-message" class="mt-1 text-sm"></p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ========================= -->
+    <script src="js/auth.js"></script>
+
+    <script>
+        (function () {
+            "use strict";
+
+            const API_BASE_URL = "http://127.0.0.1:8000";
+            const studentId = localStorage.getItem("student_id");
+
+            if (!studentId) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const $ = (id) => document.getElementById(id);
+
+            function escapeHTML(value) {
+                return String(value ?? "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            async function loadAttendance() {
+                const loading = $("loading");
+                const section = $("attendance-section");
+                const errorBox = $("error-box");
+                const errorMessage = $("error-message");
+                const table = $("attendance-table");
+                const mobile = $("attendance-mobile");
+
+                try {
+                    const url =
+                        `${API_BASE_URL}/students/${encodeURIComponent(studentId)}/analysis`;
+
+                    console.log("[Attendance] Fetching:", url);
+
+                    const response = await fetch(url, {
+                        method: "GET",
+                        headers: { "Accept": "application/json" },
+                        cache: "no-store"
+                    });
+
+                    const data = await response.json();
+
+                    console.log("[Attendance] Personalized API response:", data);
+
+                    if (!response.ok) {
+                        throw new Error(
+                            data.detail ||
+                            `Unable to load attendance. HTTP ${response.status}`
+                        );
+                    }
+
+                    /*
+                     * IMPORTANT:
+                     * Use ONLY subjects returned by /analysis.
+                     * Do NOT call /records here because that endpoint was
+                     * causing the page to display unrelated/stale subjects.
+                     */
+                    const subjects = Array.isArray(data.subjects)
+                        ? data.subjects
+                        : [];
+
+                    if (subjects.length === 0) {
+                        throw new Error(
+                            "No subjects found for your current semester. Please add subjects in Academic Profile."
+                        );
+                    }
+
+                    const attendanceValues = subjects.map(subject =>
+                        Number(
+                            subject.attendance_percent ??
+                            subject.attendance ??
+                            0
+                        )
+                    );
+
+                    const averageAttendance =
+                        attendanceValues.reduce((sum, value) => sum + value, 0) /
+                        subjects.length;
+
+                    const safeSubjects = subjects.filter(subject =>
+                        Number(
+                            subject.attendance_percent ??
+                            subject.attendance ??
+                            0
+                        ) >= 75
+                    );
+
+                    const riskSubjects = subjects.filter(subject =>
+                        Number(
+                            subject.attendance_percent ??
+                            subject.attendance ??
+                            0
+                        ) < 75
+                    );
+
+                    $("average-attendance").textContent =
+                        `${averageAttendance.toFixed(2)}%`;
+
+                    $("total-subjects").textContent =
+                        subjects.length;
+
+                    $("safe-subjects").textContent =
+                        safeSubjects.length;
+
+                    $("risk-subjects").textContent =
+                        riskSubjects.length;
+
+                    table.innerHTML = subjects.map(subject => {
+                        const attendance = Number(
+                            subject.attendance_percent ??
+                            subject.attendance ??
+                            0
+                        );
+
+                        const safe = attendance >= 75;
+
+                        return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-5 py-4">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">
+                                    ${escapeHTML(subject.course_code || "Course")}
+                                </p>
+                                <p class="mt-1 text-xs text-slate-500">
+                                    ${escapeHTML(subject.course_name || "")}
+                                </p>
+                            </div>
+                        </td>
+
+                        <td class="px-5 py-4">
+                            <span class="text-sm font-bold">
+                                ${attendance.toFixed(2)}%
+                            </span>
+                        </td>
+
+                        <td class="px-5 py-4">
+                            <span class="rounded-full px-2.5 py-1 text-xs font-semibold
+                                ${safe
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"}">
+                                ${safe ? "Good" : "At Risk"}
+                            </span>
+                        </td>
+
+                        <td class="px-5 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="h-2 w-32 overflow-hidden rounded-full bg-slate-200">
+                                    <div
+                                        class="h-full rounded-full ${safe ? "bg-green-500" : "bg-red-500"}"
+                                        style="width: ${Math.min(Math.max(attendance, 0), 100)}%;"
+                                    ></div>
+                                </div>
+
+                                <span class="text-xs font-medium text-slate-500">
+                                    ${attendance.toFixed(0)}%
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                    }).join("");
+
+                    mobile.innerHTML = subjects.map(subject => {
+                        const attendance = Number(
+                            subject.attendance_percent ??
+                            subject.attendance ??
+                            0
+                        );
+
+                        const safe = attendance >= 75;
+
+                        return `
+                    <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-bold">
+                                    ${escapeHTML(subject.course_code || "Course")}
+                                </p>
+
+                                <p class="mt-1 text-xs text-slate-500">
+                                    ${escapeHTML(subject.course_name || "")}
+                                </p>
+                            </div>
+
+                            <span class="rounded-full px-2.5 py-1 text-xs font-semibold
+                                ${safe
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"}">
+                                ${safe ? "Good" : "At Risk"}
+                            </span>
+                        </div>
+
+                        <div class="mt-4">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-500">
+                                    Attendance
+                                </span>
+
+                                <span class="font-bold">
+                                    ${attendance.toFixed(2)}%
+                                </span>
+                            </div>
+
+                            <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+                                <div
+                                    class="h-full rounded-full ${safe ? "bg-green-500" : "bg-red-500"}"
+                                    style="width: ${Math.min(Math.max(attendance, 0), 100)}%;"
+                                ></div>
+                            </div>
+                        </div>
+                    </article>
+                `;
+                    }).join("");
+
+                    loading.classList.add("hidden");
+                    errorBox.classList.add("hidden");
+                    section.classList.remove("hidden");
+
+                    console.log(
+                        `[Attendance] Rendered ${subjects.length} personalized subjects for ${studentId}.`
+                    );
+                } catch (error) {
+                    console.error("[Attendance] ERROR:", error);
+
+                    loading.classList.add("hidden");
+                    section.classList.add("hidden");
+                    errorBox.classList.remove("hidden");
+                    errorMessage.textContent =
+                        error.message || "Unable to load attendance data.";
+                }
+            }
+
+            loadAttendance();
+        })();
+    </script>
+
+</body>
+
+</html>

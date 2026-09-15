@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Academic Profile - AcadAI Advisor</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+</head>
+
+
+<body class="min-h-screen bg-slate-950 text-white">
+
+<div class="mx-auto max-w-6xl px-6 py-10">
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="mb-8">
+
+        <a
+            href="dashboard.html"
+            class="text-indigo-400 hover:text-indigo-300"
+        >
+            <i class="fa-solid fa-arrow-left mr-2"></i>
+            Back to Dashboard
+        </a>
+
+        <h1 class="mt-5 text-3xl font-bold">
+            Academic Profile
+        </h1>
+
+        <p class="mt-2 text-slate-400">
+            Manage your academic information semester by semester.
+            Your dashboard and AI advisor will use this data.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         FORM
+         ===================================================== -->
+
+    <form
+        id="academic-profile-form"
+        class="space-y-8"
+        novalidate
+    >
+
+        <!-- =================================================
+             OVERALL ACADEMIC INFORMATION
+             ================================================= -->
+
+        <section
+            class="rounded-2xl border border-slate-800 bg-slate-900 p-6"
+        >
+
+            <h2 class="mb-6 text-xl font-bold">
+                Academic Information
+            </h2>
+
+
+            <div class="grid gap-5 md:grid-cols-2">
+
+                <!-- CURRENT OVERALL CGPA -->
+
+                <div>
+
+                    <label
+                        for="cgpa"
+                        class="mb-2 block text-sm text-slate-300"
+                    >
+                        Current Overall CGPA
+                    </label>
+
+                    <input
+                        id="cgpa"
+                        type="number"
+                        min="0"
+                        max="10"
+                        step="0.01"
+                        required
+                        placeholder="e.g. 7.54"
+                        class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 outline-none focus:border-indigo-500"
+                    >
+
+                </div>
+
+
+                <!-- TARGET CGPA -->
+
+                <div>
+
+                    <label
+                        for="target-cgpa"
+                        class="mb-2 block text-sm text-slate-300"
+                    >
+                        Target CGPA
+                    </label>
+
+                    <input
+                        id="target-cgpa"
+                        type="number"
+                        min="0"
+                        max="10"
+                        step="0.01"
+                        required
+                        placeholder="e.g. 9.00"
+                        class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 outline-none focus:border-indigo-500"
+                    >
+
+                </div>
+
+
+                <!-- CAREER -->
+
+                <div>
+
+                    <label
+                        for="career-goal"
+                        class="mb-2 block text-sm text-slate-300"
+                    >
+                        Target Career
+                    </label>
+
+                    <select
+                        id="career-goal"
+                        class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 outline-none focus:border-indigo-500"
+                    >
+
+                        <option value="">
+                            Select career
+                        </option>
+
+                        <option value="AI/ML Engineer">
+                            AI/ML Engineer
+                        </option>
+
+                        <option value="Data Scientist">
+                            Data Scientist
+                        </option>
+
+                        <option value="Data Engineer">
+                            Data Engineer
+                        </option>
+
+                        <option value="Software Engineer">
+                            Software Engineer
+                        </option>
+
+                        <option value="Web Developer">
+                            Web Developer
+                        </option>
+
+                        <option value="Cybersecurity Engineer">
+                            Cybersecurity Engineer
+                        </option>
+
+                        <option value="Cloud Engineer">
+                            Cloud Engineer
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- CURRENT SEMESTER -->
+
+                <div>
+
+                    <label
+                        for="current-semester"
+                        class="mb-2 block text-sm text-slate-300"
+                    >
+                        Current Semester
+                    </label>
+
+                    <select
+                        id="current-semester"
+                        required
+                        class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 outline-none focus:border-indigo-500"
+                    >
+
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                        <option value="9">Semester 9</option>
+                        <option value="10">Semester 10</option>
+                        <option value="11">Semester 11</option>
+                        <option value="12">Semester 12</option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- ACADEMIC YEAR -->
+
+                <div>
+
+                    <label
+                        for="academic-year"
+                        class="mb-2 block text-sm text-slate-300"
+                    >
+                        Academic Year
+                    </label>
+
+                    <input
+                        id="academic-year"
+                        type="text"
+                        required
+                        placeholder="2025-2026"
+                        class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 outline-none focus:border-indigo-500"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SEMESTER SELECTOR
+             ================================================= -->
+
+        <section
+            class="rounded-2xl border border-indigo-900 bg-indigo-950/30 p-6"
+        >
+
+            <div class="grid gap-5 md:grid-cols-2">
+
+                <div>
+
+                    <label
+                        for="editing-semester"
+                        class="mb-2 block text-sm font-semibold text-indigo-300"
+                    >
+                        Semester Being Edited
+                    </label>
+
+                    <select
+                        id="editing-semester"
+                        class="w-full rounded-xl border border-indigo-700 bg-slate-950 px-4 py-3 outline-none focus:border-indigo-500"
+                    >
+
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                        <option value="9">Semester 9</option>
+                        <option value="10">Semester 10</option>
+                        <option value="11">Semester 11</option>
+                        <option value="12">Semester 12</option>
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label
+                        for="semester-cgpa"
+                        class="mb-2 block text-sm text-slate-300"
+                    >
+                        Semester CGPA
+                    </label>
+
+                    <input
+                        id="semester-cgpa"
+                        type="number"
+                        min="0"
+                        max="10"
+                        step="0.01"
+                        placeholder="e.g. 7.54"
+                        class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 outline-none focus:border-indigo-500"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SUBJECTS
+             ================================================= -->
+
+        <section
+            class="rounded-2xl border border-slate-800 bg-slate-900 p-6"
+        >
+
+            <div
+                class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+
+                <div>
+
+                    <h2 class="text-xl font-bold">
+
+                        <span id="semester-title">
+                            Semester 1
+                        </span>
+
+                        Subjects
+
+                    </h2>
+
+                    <p class="mt-1 text-sm text-slate-400">
+                        Add all subjects, marks and attendance
+                        for the selected semester.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="add-subject"
+                    class="rounded-xl bg-indigo-600 px-4 py-2 font-semibold hover:bg-indigo-500"
+                >
+
+                    <i class="fa-solid fa-plus mr-2"></i>
+
+                    Add Subject
+
+                </button>
+
+            </div>
+
+
+            <div
+                id="subjects-container"
+                class="space-y-4"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             SAVE
+             ================================================= -->
+
+        <div>
+
+            <button
+                type="submit"
+                id="save-button"
+                class="w-full rounded-xl bg-indigo-600 px-6 py-4 text-lg font-bold hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+
+                <i class="fa-solid fa-floppy-disk mr-2"></i>
+
+                Save Semester
+
+            </button>
+
+
+            <p
+                id="status"
+                class="mt-4 min-h-[24px] text-center text-sm"
+            ></p>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script src="js/auth.js"></script>
+
+
+<script>
+
+(function () {
+
+    "use strict";
+
+
+    // ========================================================
+    // CONFIG
+    // ========================================================
+
+    const API_BASE_URL =
+        "http://127.0.0.1:8000";
+
+
+    // ========================================================
+    // STUDENT
+    // ========================================================
+
+    const studentId =
+        localStorage.getItem("student_id");
+
+
+    if (!studentId) {
+
+        window.location.href =
+            "login.html";
+
+        return;
+
+    }
+
+
+    console.log(
+        "[Academic Profile] Student:",
+        studentId
+    );
+
+
+    // ========================================================
+    // DOM
+    // ========================================================
+
+    const form =
+        document.getElementById(
+            "academic-profile-form"
+        );
+
+    const cgpaInput =
+        document.getElementById("cgpa");
+
+    const targetCgpaInput =
+        document.getElementById("target-cgpa");
+
+    const careerGoalInput =
+        document.getElementById("career-goal");
+
+    const currentSemesterInput =
+        document.getElementById("current-semester");
+
+    const editingSemesterInput =
+        document.getElementById("editing-semester");
+
+    const semesterCgpaInput =
+        document.getElementById("semester-cgpa");
+
+    const academicYearInput =
+        document.getElementById("academic-year");
+
+    const semesterTitle =
+        document.getElementById("semester-title");
+
+    const subjectsContainer =
+        document.getElementById(
+            "subjects-container"
+        );
+
+    const addSubjectButton =
+        document.getElementById("add-subject");
+
+    const saveButton =
+        document.getElementById("save-button");
+
+    const statusElement =
+        document.getElementById("status");
+
+
+    // ========================================================
+    // STATUS
+    // ========================================================
+
+    function showStatus(
+        message,
+        type = "info"
+    ) {
+
+        statusElement.textContent =
+            message;
+
+
+        if (type === "success") {
+
+            statusElement.className =
+                "mt-4 min-h-[24px] text-center text-sm text-green-400";
+
+        }
+
+        else if (type === "error") {
+
+            statusElement.className =
+                "mt-4 min-h-[24px] text-center text-sm text-red-400";
+
+        }
+
+        else {
+
+            statusElement.className =
+                "mt-4 min-h-[24px] text-center text-sm text-indigo-400";
+
+        }
+
+    }
+
+
+    // ========================================================
+    // ESCAPE HTML
+    // ========================================================
+
+    function escapeHTML(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    // ========================================================
+    // UPDATE TITLE
+    // ========================================================
+
+    function updateSemesterTitle() {
+
+        const semester =
+            Number(
+                editingSemesterInput.value
+            );
+
+        semesterTitle.textContent =
+            `Semester ${semester}`;
+
+    }
+
+
+    // ========================================================
+    // ADD SUBJECT
+    // ========================================================
+
+    function addSubject(subject = {}) {
+
+        const row =
+            document.createElement("div");
+
+
+        row.className =
+            "subject-row rounded-xl border border-slate-700 bg-slate-950 p-5";
+
+
+        row.innerHTML = `
+
+            <div
+                class="grid gap-4 md:grid-cols-2 lg:grid-cols-5"
+            >
+
+                <div>
+
+                    <label
+                        class="mb-2 block text-xs text-slate-400"
+                    >
+                        Course Code
+                    </label>
+
+                    <input
+                        type="text"
+                        data-field="course_code"
+                        value="${escapeHTML(subject.course_code)}"
+                        required
+                        placeholder="CSE101"
+                        class="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-white outline-none focus:border-indigo-500"
+                    >
+
+                </div>
+
+
+                <div class="lg:col-span-2">
+
+                    <label
+                        class="mb-2 block text-xs text-slate-400"
+                    >
+                        Subject Name
+                    </label>
+
+                    <input
+                        type="text"
+                        data-field="course_name"
+                        value="${escapeHTML(subject.course_name)}"
+                        required
+                        placeholder="Data Structures"
+                        class="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-white outline-none focus:border-indigo-500"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label
+                        class="mb-2 block text-xs text-slate-400"
+                    >
+                        Marks / 100
+                    </label>
+
+                    <input
+                        type="number"
+                        data-field="marks"
+                        value="${subject.marks ?? ""}"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        required
+                        placeholder="75"
+                        class="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-white outline-none focus:border-indigo-500"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label
+                        class="mb-2 block text-xs text-slate-400"
+                    >
+                        Attendance %
+                    </label>
+
+                    <input
+                        type="number"
+                        data-field="attendance_percent"
+                        value="${subject.attendance_percent ?? ""}"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        required
+                        placeholder="85"
+                        class="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-white outline-none focus:border-indigo-500"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="mt-4 flex justify-end">
+
+                <button
+                    type="button"
+                    class="remove-subject rounded-lg px-3 py-2 text-sm text-red-400 hover:bg-red-500/10"
+                >
+
+                    <i class="fa-solid fa-trash mr-1"></i>
+
+                    Remove
+
+                </button>
+
+            </div>
+
+        `;
+
+
+        row
+            .querySelector(".remove-subject")
+            .addEventListener(
+                "click",
+                function () {
+
+                    row.remove();
+
+                }
+            );
+
+
+        subjectsContainer.appendChild(row);
+
+    }
+
+
+    // ========================================================
+    // ADD SUBJECT BUTTON
+    // ========================================================
+
+    addSubjectButton.addEventListener(
+        "click",
+        function () {
+
+            addSubject();
+
+        }
+    );
+
+
+    // ========================================================
+    // COLLECT SUBJECTS
+    // ========================================================
+
+    function collectSubjects() {
+
+        const rows =
+            subjectsContainer.querySelectorAll(
+                ".subject-row"
+            );
+
+
+        const subjects = [];
+
+
+        rows.forEach(function (row) {
+
+            const courseCode =
+                row.querySelector(
+                    '[data-field="course_code"]'
+                );
+
+            const courseName =
+                row.querySelector(
+                    '[data-field="course_name"]'
+                );
+
+            const marks =
+                row.querySelector(
+                    '[data-field="marks"]'
+                );
+
+            const attendance =
+                row.querySelector(
+                    '[data-field="attendance_percent"]'
+                );
+
+
+            if (
+                !courseCode ||
+                !courseName ||
+                !marks ||
+                !attendance
+            ) {
+
+                return;
+
+            }
+
+
+            subjects.push({
+
+                course_code:
+                    courseCode.value.trim(),
+
+                course_name:
+                    courseName.value.trim(),
+
+                marks:
+                    Number(marks.value),
+
+                attendance_percent:
+                    Number(attendance.value),
+
+                status:
+                    "completed"
+
+            });
+
+        });
+
+
+        return subjects;
+
+    }
+
+
+    // ========================================================
+    // LOAD PROFILE
+    // ========================================================
+
+    async function loadProfile() {
+
+        try {
+
+            showStatus(
+                "Loading your academic profile..."
+            );
+
+
+            const url =
+                `${API_BASE_URL}/students/${encodeURIComponent(studentId)}/academic-profile`;
+
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        },
+                        cache: "no-store"
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.detail ||
+                    `Unable to load profile. HTTP ${response.status}`
+                );
+
+            }
+
+
+            // =================================================
+            // NEW PROFILE
+            // =================================================
+
+            if (!data.profile_exists) {
+
+                cgpaInput.value = "";
+
+                targetCgpaInput.value = "";
+
+                careerGoalInput.value = "";
+
+                currentSemesterInput.value = "1";
+
+                editingSemesterInput.value = "1";
+
+                semesterCgpaInput.value = "";
+
+                academicYearInput.value =
+                    "2025-2026";
+
+                subjectsContainer.innerHTML = "";
+
+                addSubject();
+
+                updateSemesterTitle();
+
+                showStatus(
+                    "Enter your academic details."
+                );
+
+                return;
+
+            }
+
+
+            // =================================================
+            // LOAD OVERALL PROFILE
+            // =================================================
+
+            cgpaInput.value =
+                data.cgpa ?? "";
+
+            targetCgpaInput.value =
+                data.target_cgpa ?? "";
+
+            careerGoalInput.value =
+                data.career_goal ?? "";
+
+            currentSemesterInput.value =
+                data.current_semester ?? "1";
+
+            academicYearInput.value =
+                data.academic_year ?? "2025-2026";
+
+
+            // =================================================
+            // EDIT CURRENT SEMESTER
+            // =================================================
+
+            editingSemesterInput.value =
+                data.current_semester ?? "1";
+
+
+            updateSemesterTitle();
+
+
+            await loadSemester();
+
+
+            showStatus(
+                "Academic profile loaded.",
+                "success"
+            );
+
+
+            setTimeout(
+                function () {
+
+                    statusElement.textContent = "";
+
+                },
+                1500
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "[Academic Profile] LOAD ERROR:",
+                error
+            );
+
+
+            showStatus(
+                error.message ||
+                "Unable to load academic profile.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    // ========================================================
+    // LOAD SELECTED SEMESTER
+    // ========================================================
+
+    async function loadSemester() {
+
+        const semester =
+            Number(
+                editingSemesterInput.value
+            );
+
+
+        const academicYear =
+            academicYearInput.value.trim();
+
+
+        updateSemesterTitle();
+
+
+        try {
+
+            showStatus(
+                `Loading Semester ${semester}...`
+            );
+
+
+            const url =
+                `${API_BASE_URL}/students/${encodeURIComponent(studentId)}/academic-profile?semester=${semester}&academic_year=${encodeURIComponent(academicYear)}`;
+
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        },
+                        cache: "no-store"
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.detail ||
+                    `Unable to load semester. HTTP ${response.status}`
+                );
+
+            }
+
+
+            // =================================================
+            // SEMESTER CGPA
+            // =================================================
+
+            semesterCgpaInput.value =
+                data.semester_cgpa ?? "";
+
+
+            // =================================================
+            // SUBJECTS
+            // =================================================
+
+            subjectsContainer.innerHTML = "";
+
+
+            if (
+                Array.isArray(data.subjects) &&
+                data.subjects.length > 0
+            ) {
+
+                data.subjects.forEach(
+                    function (subject) {
+
+                        addSubject(subject);
+
+                    }
+                );
+
+            }
+
+            else {
+
+                addSubject();
+
+            }
+
+
+            showStatus(
+                `Semester ${semester} loaded.`
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "[Academic Profile] SEMESTER LOAD ERROR:",
+                error
+            );
+
+
+            subjectsContainer.innerHTML = "";
+
+            addSubject();
+
+
+            showStatus(
+                error.message ||
+                "Unable to load semester.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    // ========================================================
+    // CHANGE EDITING SEMESTER
+    // ========================================================
+
+    editingSemesterInput.addEventListener(
+        "change",
+        async function () {
+
+            await loadSemester();
+
+        }
+    );
+
+
+    // ========================================================
+    // ACADEMIC YEAR CHANGE
+    // ========================================================
+
+    academicYearInput.addEventListener(
+        "change",
+        async function () {
+
+            await loadSemester();
+
+        }
+    );
+
+
+    // ========================================================
+    // VALIDATE
+    // ========================================================
+
+    function validateForm(
+        cgpa,
+        targetCgpa,
+        currentSemester,
+        editingSemester,
+        semesterCgpa,
+        academicYear,
+        subjects
+    ) {
+
+        if (
+            !Number.isFinite(cgpa) ||
+            cgpa < 0 ||
+            cgpa > 10
+        ) {
+
+            showStatus(
+                "Enter a valid overall CGPA between 0 and 10.",
+                "error"
+            );
+
+            cgpaInput.focus();
+
+            return false;
+
+        }
+
+
+        if (
+            !Number.isFinite(targetCgpa) ||
+            targetCgpa < 0 ||
+            targetCgpa > 10
+        ) {
+
+            showStatus(
+                "Enter a valid target CGPA between 0 and 10.",
+                "error"
+            );
+
+            targetCgpaInput.focus();
+
+            return false;
+
+        }
+
+
+        if (
+            !Number.isInteger(currentSemester) ||
+            currentSemester < 1 ||
+            currentSemester > 12
+        ) {
+
+            showStatus(
+                "Select a valid current semester.",
+                "error"
+            );
+
+            currentSemesterInput.focus();
+
+            return false;
+
+        }
+
+
+        if (
+            !Number.isInteger(editingSemester) ||
+            editingSemester < 1 ||
+            editingSemester > 12
+        ) {
+
+            showStatus(
+                "Select a valid semester to edit.",
+                "error"
+            );
+
+            editingSemesterInput.focus();
+
+            return false;
+
+        }
+
+
+        if (
+            !Number.isFinite(semesterCgpa) ||
+            semesterCgpa < 0 ||
+            semesterCgpa > 10
+        ) {
+
+            showStatus(
+                "Enter a valid semester CGPA between 0 and 10.",
+                "error"
+            );
+
+            semesterCgpaInput.focus();
+
+            return false;
+
+        }
+
+
+        if (!academicYear) {
+
+            showStatus(
+                "Enter the academic year.",
+                "error"
+            );
+
+            academicYearInput.focus();
+
+            return false;
+
+        }
+
+
+        if (subjects.length === 0) {
+
+            showStatus(
+                "Add at least one subject.",
+                "error"
+            );
+
+            return false;
+
+        }
+
+
+        for (
+            let i = 0;
+            i < subjects.length;
+            i++
+        ) {
+
+            const subject =
+                subjects[i];
+
+
+            if (
+                !subject.course_code ||
+                !subject.course_name
+            ) {
+
+                showStatus(
+                    `Complete all fields for Subject ${i + 1}.`,
+                    "error"
+                );
+
+                return false;
+
+            }
+
+
+            if (
+                !Number.isFinite(subject.marks) ||
+                subject.marks < 0 ||
+                subject.marks > 100
+            ) {
+
+                showStatus(
+                    `Invalid marks for Subject ${i + 1}.`,
+                    "error"
+                );
+
+                return false;
+
+            }
+
+
+            if (
+                !Number.isFinite(
+                    subject.attendance_percent
+                ) ||
+                subject.attendance_percent < 0 ||
+                subject.attendance_percent > 100
+            ) {
+
+                showStatus(
+                    `Invalid attendance for Subject ${i + 1}.`,
+                    "error"
+                );
+
+                return false;
+
+            }
+
+        }
+
+
+        return true;
+
+    }
+
+
+    // ========================================================
+    // SAVE
+    // ========================================================
+
+    form.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const cgpa =
+                Number(
+                    cgpaInput.value
+                );
+
+
+            const targetCgpa =
+                Number(
+                    targetCgpaInput.value
+                );
+
+
+            const careerGoal =
+                careerGoalInput.value.trim();
+
+
+            const currentSemester =
+                Number(
+                    currentSemesterInput.value
+                );
+
+
+            const editingSemester =
+                Number(
+                    editingSemesterInput.value
+                );
+
+
+            const semesterCgpa =
+                Number(
+                    semesterCgpaInput.value
+                );
+
+
+            const academicYear =
+                academicYearInput.value.trim();
+
+
+            const subjects =
+                collectSubjects();
+
+
+            // =================================================
+            // VALIDATION
+            // =================================================
+
+            if (
+                !validateForm(
+                    cgpa,
+                    targetCgpa,
+                    currentSemester,
+                    editingSemester,
+                    semesterCgpa,
+                    academicYear,
+                    subjects
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            // =================================================
+            // PAYLOAD
+            // =================================================
+
+            const payload = {
+
+                cgpa:
+                    cgpa,
+
+                target_cgpa:
+                    targetCgpa,
+
+                career_goal:
+                    careerGoal,
+
+                /*
+                 * This is the student's REAL current semester.
+                 */
+                current_semester:
+                    currentSemester,
+
+                academic_year:
+                    academicYear,
+
+                /*
+                 * This tells the backend which semester
+                 * these subjects actually belong to.
+                 */
+                selected_semester:
+                    editingSemester,
+
+                semester_cgpa:
+                    semesterCgpa,
+
+                subjects:
+                    subjects
+
+            };
+
+
+            console.log(
+                "[Academic Profile] SAVE PAYLOAD:",
+                payload
+            );
+
+
+            saveButton.disabled = true;
+
+
+            showStatus(
+                `Saving Semester ${editingSemester}...`
+            );
+
+
+            try {
+
+                const url =
+                    `${API_BASE_URL}/students/${encodeURIComponent(studentId)}/academic-profile`;
+
+
+                const response =
+                    await fetch(
+                        url,
+                        {
+
+                            method: "PUT",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "Accept":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify(payload)
+
+                        }
+                    );
+
+
+                const responseText =
+                    await response.text();
+
+
+                let data = {};
+
+
+                try {
+
+                    data =
+                        JSON.parse(
+                            responseText
+                        );
+
+                }
+
+                catch {
+
+                    console.warn(
+                        "[Academic Profile] Non-JSON response:",
+                        responseText
+                    );
+
+                }
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.detail ||
+                        data.message ||
+                        `Unable to save profile. HTTP ${response.status}`
+                    );
+
+                }
+
+
+                // =================================================
+                // SUCCESS
+                // =================================================
+
+                showStatus(
+                    `Semester ${editingSemester} saved successfully.`,
+                    "success"
+                );
+
+
+                /*
+                 * Reload the exact semester that was saved.
+                 */
+                await loadSemester();
+
+
+                showStatus(
+                    `Semester ${editingSemester} saved successfully.`,
+                    "success"
+                );
+
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "[Academic Profile] SAVE ERROR:",
+                    error
+                );
+
+
+                showStatus(
+                    error.message ||
+                    "Unable to save academic profile.",
+                    "error"
+                );
+
+            }
+
+            finally {
+
+                saveButton.disabled = false;
+
+            }
+
+        }
+    );
+
+
+    // ========================================================
+    // INITIALIZE
+    // ========================================================
+
+    loadProfile();
+
+
+})();
+
+</script>
+
+</body>
+</html>
