@@ -2,10 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from backend.database import get_connection
 
-router = APIRouter(
-    prefix="/students",
-    tags=["Students"]
-)
+router = APIRouter(prefix="/students", tags=["Students"])
 
 
 @router.get("/{student_id}")
@@ -26,17 +23,14 @@ def get_student(student_id: str):
         FROM users
         WHERE student_id = ?
         """,
-        (student_id,)
+        (student_id,),
     )
 
     user = cursor.fetchone()
 
     if not user:
         connection.close()
-        raise HTTPException(
-            status_code=404,
-            detail="Student not found"
-        )
+        raise HTTPException(status_code=404, detail="Student not found")
 
     # ---------------------------------------------------------
     # GET ACADEMIC PROFILE
@@ -54,7 +48,7 @@ def get_student(student_id: str):
         FROM academic_profiles
         WHERE student_id = ?
         """,
-        (student_id,)
+        (student_id,),
     )
 
     profile = cursor.fetchone()
@@ -69,17 +63,17 @@ def get_student(student_id: str):
             "target_cgpa": None,
             "career_goal": None,
             "current_semester": None,
-            "academic_year": None
+            "academic_year": None,
         }
 
     connection.close()
 
     return {
-        "student_id": profile[0],
+        "student_id": profile["student_id"],
         "profile_exists": True,
-        "cgpa": profile[1],
-        "target_cgpa": profile[2],
-        "career_goal": profile[3],
-        "current_semester": profile[4],
-        "academic_year": profile[5]
+        "cgpa": profile["cgpa"],
+        "target_cgpa": profile["target_cgpa"],
+        "career_goal": profile["career_goal"],
+        "current_semester": profile["current_semester"],
+        "academic_year": profile["academic_year"],
     }
