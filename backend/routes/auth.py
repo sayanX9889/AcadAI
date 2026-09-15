@@ -27,6 +27,11 @@ from datetime import datetime
 import hashlib
 import hmac
 import secrets
+import os
+import re
+import smtplib
+from email.message import EmailMessage
+from datetime import timedelta
 
 from backend.database import get_connection
 
@@ -107,6 +112,20 @@ class LoginRequest(BaseModel):
 
     student_id: str
     password: str
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class VerifyResetCodeRequest(BaseModel):
+    email: EmailStr
+    code: str
+
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    reset_token: str
+    new_password: str
 
 
 # ============================================================
@@ -339,6 +358,402 @@ def login(request: LoginRequest):
         }
     }
     # ============================================================
+# PASSWORD RESET / EMAIL OTP
+# ============================================================
+
+OTP_EXPIRY_MINUTES = 10
+RESET_TOKEN_EXPIRY_MINUTES = 10
+MAX_OTP_ATTEMPTS = 5
+
+
+def hash_reset_value(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def send_password_reset_email(email: str, otp: str):
+    gmail_address = os.getenv("GMAIL_ADDRESS")
+    gmail_app_password = os.getenv("GMAIL_APP_PASSWORD")
+
+    if not gmail_address or not gmail_app_password:
+        raise RuntimeError(
+            "GMAIL_ADDRESS and GMAIL_APP_PASSWORD are not configured."
+        )
+
+    message = EmailMessage()
+    message["Subject"] = "AcadAI Password Reset Code"
+    message["From"] = gmail_address
+    message["To"] = email
+    message.set_content(
+        f"""Hello,
+
+We received a request to reset your AcadAI password.
+
+Your 6-digit password reset code is:
+
+{otp}
+
+This code expires in {OTP_EXPIRY_MINUTES} minutes.
+
+If you did not request this password reset, you can safely ignore this email.
+
+Regards,
+AcadAI
+"""
+    )
+
+    with smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as smtp:
+        smtp.starttls()
+        smtp.login(gmail_address, gmail_app_password)
+        smtp.send_message(message)
+
+
+@router.post("/forgot-password")
+def forgot_password(request: ForgotPasswordRequest):
+    email = str(request.email).strip().lower()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT student_id
+            FROM users
+            WHERE email = ?
+            """,
+            (email,)
+        )
+        user = cursor.fetchone()
+
+        # Keep the response generic so account existence is not disclosed.
+        if not user:
+            return {
+                "success": True,
+                "message": "If an account exists for this email, a reset code has been sent."
+            }
+
+        # Invalidate previous reset codes for this account.
+        cursor.execute(
+            """
+            UPDATE email_verifications
+            SET used = TRUE,
+                reset_token_hash = NULL,
+                reset_token_expires_at = NULL
+            WHERE student_id = ? AND used = FALSE
+            """,
+            (user["student_id"],)
+        )
+
+        otp = f"{secrets.randbelow(1_000_000):06d}"
+        otp_hash = hash_reset_value(otp)
+        now = datetime.now()
+        expires_at = (now + timedelta(minutes=OTP_EXPIRY_MINUTES)).isoformat()
+
+        cursor.execute(
+            """
+            INSERT INTO email_verifications (
+                student_id,
+                email,
+                otp_hash,
+                expires_at,
+                used,
+                attempts,
+                reset_token_hash,
+                reset_token_expires_at,
+                created_at
+            )
+            VALUES (?, ?, ?, ?, FALSE, 0, NULL, NULL, ?)
+            """,
+            (
+                user["student_id"],
+                email,
+                otp_hash,
+                expires_at,
+                now.isoformat()
+            )
+        )
+        connection.commit()
+
+        try:
+            send_password_reset_email(email, otp)
+        except Exception:
+            # Do not leave a usable code when delivery failed.
+            cursor.execute(
+                """
+                UPDATE email_verifications
+                SET used = TRUE
+                WHERE student_id = ? AND otp_hash = ?
+                """,
+                (user["student_id"], otp_hash)
+            )
+            connection.commit()
+            raise HTTPException(
+                status_code=500,
+                detail="Unable to send password reset email. Please try again later."
+            )
+
+        return {
+            "success": True,
+            "message": "If an account exists for this email, a reset code has been sent."
+        }
+
+    except HTTPException:
+        connection.rollback()
+        raise
+    except Exception as error:
+        connection.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unable to process password reset request: {error}"
+        )
+    finally:
+        connection.close()
+
+
+@router.post("/verify-reset-code")
+def verify_reset_code(request: VerifyResetCodeRequest):
+    email = str(request.email).strip().lower()
+    code = request.code.strip()
+
+    if not re.fullmatch(r"\d{6}", code):
+        raise HTTPException(
+            status_code=400,
+            detail="Reset code must contain exactly 6 digits."
+        )
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT
+                id,
+                student_id,
+                otp_hash,
+                expires_at,
+                used,
+                attempts
+            FROM email_verifications
+            WHERE email = ?
+            ORDER BY created_at DESC
+            LIMIT 1
+            """,
+            (email,)
+        )
+        verification = cursor.fetchone()
+
+        if not verification or verification["used"]:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid or expired reset code."
+            )
+
+        if verification["attempts"] >= MAX_OTP_ATTEMPTS:
+            cursor.execute(
+                """
+                UPDATE email_verifications
+                SET used = TRUE
+                WHERE id = ?
+                """,
+                (verification["id"],)
+            )
+            connection.commit()
+            raise HTTPException(
+                status_code=400,
+                detail="Too many incorrect attempts. Please request a new code."
+            )
+
+        try:
+            expires_at = datetime.fromisoformat(verification["expires_at"])
+        except (ValueError, TypeError):
+            expires_at = datetime.min
+
+        if datetime.now() > expires_at:
+            cursor.execute(
+                """
+                UPDATE email_verifications
+                SET used = TRUE
+                WHERE id = ?
+                """,
+                (verification["id"],)
+            )
+            connection.commit()
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid or expired reset code."
+            )
+
+        if not hmac.compare_digest(
+            hash_reset_value(code),
+            verification["otp_hash"]
+        ):
+            cursor.execute(
+                """
+                UPDATE email_verifications
+                SET attempts = attempts + 1
+                WHERE id = ?
+                """,
+                (verification["id"],)
+            )
+            connection.commit()
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid or expired reset code."
+            )
+
+        reset_token = secrets.token_urlsafe(32)
+        reset_token_hash = hash_reset_value(reset_token)
+        reset_token_expires_at = (
+            datetime.now() + timedelta(minutes=RESET_TOKEN_EXPIRY_MINUTES)
+        ).isoformat()
+
+        cursor.execute(
+            """
+            UPDATE email_verifications
+            SET used = TRUE,
+                reset_token_hash = ?,
+                reset_token_expires_at = ?
+            WHERE id = ?
+            """,
+            (
+                reset_token_hash,
+                reset_token_expires_at,
+                verification["id"]
+            )
+        )
+        connection.commit()
+
+        return {
+            "success": True,
+            "message": "Reset code verified successfully.",
+            "reset_token": reset_token
+        }
+
+    except HTTPException:
+        raise
+    except Exception as error:
+        connection.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unable to verify reset code: {error}"
+        )
+    finally:
+        connection.close()
+
+
+@router.post("/reset-password")
+def reset_password(request: ResetPasswordRequest):
+    email = str(request.email).strip().lower()
+    reset_token = request.reset_token.strip()
+    new_password = request.new_password
+
+    if len(new_password) < 6:
+        raise HTTPException(
+            status_code=400,
+            detail="Password must be at least 6 characters."
+        )
+
+    if not reset_token:
+        raise HTTPException(
+            status_code=400,
+            detail="Reset token is required."
+        )
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        reset_token_hash = hash_reset_value(reset_token)
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                student_id,
+                reset_token_expires_at
+            FROM email_verifications
+            WHERE email = ?
+              AND reset_token_hash = ?
+              AND used = TRUE
+            ORDER BY created_at DESC
+            LIMIT 1
+            """,
+            (email, reset_token_hash)
+        )
+        verification = cursor.fetchone()
+
+        if not verification:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid or expired reset session."
+            )
+
+        try:
+            token_expires_at = datetime.fromisoformat(
+                verification["reset_token_expires_at"]
+            )
+        except (ValueError, TypeError):
+            token_expires_at = datetime.min
+
+        if datetime.now() > token_expires_at:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid or expired reset session."
+            )
+
+        new_password_hash = hash_password(new_password)
+
+        cursor.execute(
+            """
+            UPDATE users
+            SET password_hash = ?
+            WHERE student_id = ? AND email = ?
+            """,
+            (
+                new_password_hash,
+                verification["student_id"],
+                email
+            )
+        )
+
+        if cursor.rowcount != 1:
+            raise HTTPException(
+                status_code=404,
+                detail="Student account not found."
+            )
+
+        cursor.execute(
+            """
+            UPDATE email_verifications
+            SET reset_token_hash = NULL,
+                reset_token_expires_at = NULL
+            WHERE id = ?
+            """,
+            (verification["id"],)
+        )
+
+        connection.commit()
+
+        return {
+            "success": True,
+            "message": "Password reset successfully. You can now log in."
+        }
+
+    except HTTPException:
+        connection.rollback()
+        raise
+    except Exception as error:
+        connection.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unable to reset password: {error}"
+        )
+    finally:
+        connection.close()
+
+
+# ============================================================
 # GET PROFILE
 # ============================================================
 
@@ -598,7 +1013,7 @@ def delete_account(student_id: str):
     try:
 
         # ----------------------------------------------------
-        # CHECK ACCOUNT
+        # CHECK ACCOUNT AND GET PROFILE PICTURE
         # ----------------------------------------------------
 
         cursor.execute(
@@ -615,65 +1030,102 @@ def delete_account(student_id: str):
         user = cursor.fetchone()
 
         if not user:
-
             raise HTTPException(
                 status_code=404,
                 detail="Student account not found."
             )
 
-        # ----------------------------------------------------
-        # DELETE PROFILE PICTURE FROM DISK
-        # ----------------------------------------------------
-
         old_picture = user["profile_picture"]
 
-        if old_picture:
-
-            old_path = PROFILE_DIR / old_picture
-
-            if old_path.exists() and old_path.is_file():
-                old_path.unlink()
-
         # ----------------------------------------------------
-        # DELETE USER-OWNED ACADEMIC PROFILE DATA
+        # DELETE USER-OWNED DATA
+        #
+        # academic_profiles, academic_subjects and
+        # academic_semesters already use ON DELETE CASCADE
+        # through users(student_id).
+        #
+        # notifications, feedback and email_verifications
+        # are explicitly deleted here for a complete cleanup.
         # ----------------------------------------------------
-        # These tables are created/used by academic_profile.py.
-        # Check that they exist so account deletion still works
-        # with older databases.
 
+        # Notifications
         cursor.execute(
-            "SELECT name FROM sqlite_master "
-            "WHERE type='table' AND name IN "
-            "('academic_subjects', 'academic_profiles')"
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name = 'notifications'
+            ) AS table_exists
+            """
         )
 
-        existing_tables = {
-            row["name"]
-            for row in cursor.fetchall()
-        }
+        notifications_table = cursor.fetchone()
 
-        if "academic_subjects" in existing_tables:
-
+        if notifications_table and notifications_table["table_exists"]:
             cursor.execute(
                 """
-                DELETE FROM academic_subjects
+                DELETE FROM notifications
                 WHERE student_id = ?
                 """,
                 (student_id,)
             )
 
-        if "academic_profiles" in existing_tables:
+        # Feedback
+        cursor.execute(
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name = 'feedback'
+            ) AS table_exists
+            """
+        )
 
+        feedback_table = cursor.fetchone()
+
+        if feedback_table and feedback_table["table_exists"]:
             cursor.execute(
                 """
-                DELETE FROM academic_profiles
+                DELETE FROM feedback
+                WHERE student_id = ?
+                """,
+                (student_id,)
+            )
+
+        # Email verification
+        cursor.execute(
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name = 'email_verifications'
+            ) AS table_exists
+            """
+        )
+
+        email_verifications_table = cursor.fetchone()
+
+        if email_verifications_table and email_verifications_table["table_exists"]:
+            cursor.execute(
+                """
+                DELETE FROM email_verifications
                 WHERE student_id = ?
                 """,
                 (student_id,)
             )
 
         # ----------------------------------------------------
-        # DELETE LOGIN ACCOUNT
+        # DELETE USER
+        #
+        # This automatically removes:
+        #   - academic_profiles
+        #   - academic_subjects
+        #   - academic_semesters
+        #
+        # because their foreign keys use ON DELETE CASCADE.
         # ----------------------------------------------------
 
         cursor.execute(
@@ -684,12 +1136,45 @@ def delete_account(student_id: str):
             (student_id,)
         )
 
+        if cursor.rowcount != 1:
+            raise HTTPException(
+                status_code=404,
+                detail="Student account not found."
+            )
+
+        # ----------------------------------------------------
+        # COMMIT DATABASE CLEANUP FIRST
+        # ----------------------------------------------------
+
         connection.commit()
+
+        # ----------------------------------------------------
+        # DELETE PROFILE PICTURE FROM SERVER STORAGE
+        #
+        # The database stores only the filename. The actual
+        # image file must also be removed from disk.
+        # ----------------------------------------------------
+
+        profile_picture_deleted = True
+
+        if old_picture:
+
+            old_path = PROFILE_DIR / old_picture
+
+            try:
+                if old_path.exists() and old_path.is_file():
+                    old_path.unlink()
+            except OSError:
+                # The account is already deleted from the database.
+                # Keep the response successful but report that the
+                # physical file could not be removed.
+                profile_picture_deleted = False
 
         return {
             "success": True,
-            "message": "Account deleted successfully.",
-            "student_id": student_id
+            "message": "Account and all associated data deleted successfully.",
+            "student_id": student_id,
+            "profile_picture_deleted": profile_picture_deleted
         }
 
     except HTTPException:
@@ -709,4 +1194,3 @@ def delete_account(student_id: str):
     finally:
 
         connection.close()
-
