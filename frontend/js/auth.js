@@ -2,7 +2,7 @@
 // AcadAI Advisor - Shared Authentication
 // ==========================================
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://acad-ai-backend-6494.onrender.com";
 
 
 // ==========================================
