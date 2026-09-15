@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 
 load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,11 +17,8 @@ from backend.routes.auth import router as auth_router
 from backend.routes.academic_profile import router as academic_profile_router
 from backend.routes.feedback import router as feedback_router
 from backend.routes.feedback import initialize_feedback_table
+from backend.routes.quiz import router as quiz_router
 
-
-# ============================================================
-# CREATE APPLICATION
-# ============================================================
 
 app = FastAPI(
     title="AI Academic Advisor",
@@ -28,18 +26,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-
-# ============================================================
-# INITIALIZE DATABASE
-# ============================================================
-
 initialize_database()
 initialize_feedback_table()
-
-
-# ============================================================
-# PROFILE PICTURE / UPLOADS
-# ============================================================
 
 app.mount(
     "/uploads",
@@ -47,66 +35,30 @@ app.mount(
     name="uploads"
 )
 
-
-# ============================================================
-# CORS
-# ============================================================
-
 app.add_middleware(
     CORSMiddleware,
-
     allow_origins=["*"],
-
     allow_credentials=True,
-
     allow_methods=["*"],
-
     allow_headers=["*"]
 )
 
-
-# ============================================================
-# ROUTERS
-# ============================================================
-
 app.include_router(student_router)
-
 app.include_router(records_router)
-
 app.include_router(analysis_router)
-
 app.include_router(study_plan_router)
-
 app.include_router(chatbot_router)
-
 app.include_router(auth_router)
-
-app.include_router(
-    academic_profile_router
-)
-
+app.include_router(academic_profile_router)
 app.include_router(feedback_router)
+app.include_router(quiz_router)
 
-
-# ============================================================
-# HOME
-# ============================================================
 
 @app.get("/")
 def home():
+    return {"message": "AI Academic Advisor is running"}
 
-    return {
-        "message": "AI Academic Advisor is running"
-    }
-
-
-# ============================================================
-# HEALTH CHECK
-# ============================================================
 
 @app.get("/health")
 def health():
-
-    return {
-        "status": "OK"
-    }
+    return {"status": "OK"}

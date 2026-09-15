@@ -18,7 +18,7 @@ OLLAMA_MODEL = os.getenv(
 
 OPENROUTER_MODEL = os.getenv(
     "OPENROUTER_MODEL",
-    "openrouter/free"
+    "google/gemma-4-26b-a4b-it:free"
 )
 
 OPENROUTER_URL = (
@@ -76,19 +76,12 @@ def generate_with_ollama(
 # OPENROUTER
 # ============================================================
 
-def generate_with_openrouter(
-    prompt: str,
-    system_prompt: str = ""
-) -> str:
-
-    api_key = os.getenv(
-        "OPENROUTER_API_KEY"
-    )
+def generate_with_openrouter(prompt: str, system_prompt: str = "") -> str:
+    api_key = os.getenv("OPENROUTER_API_KEY")
 
     if not api_key:
         raise RuntimeError(
-            "OPENROUTER_API_KEY environment variable "
-            "is not set."
+            "OPENROUTER_API_KEY environment variable is not set."
         )
 
     messages = []
@@ -108,7 +101,10 @@ def generate_with_openrouter(
         "model": OPENROUTER_MODEL,
         "messages": messages,
         "temperature": 0.2,
-        "max_tokens": 2048
+        "max_tokens": 8192,
+        "response_format": {
+            "type": "json_object"
+        }
     }
 
     headers = {
@@ -122,7 +118,7 @@ def generate_with_openrouter(
         OPENROUTER_URL,
         headers=headers,
         json=payload,
-        timeout=120
+        timeout=180
     )
 
     if not response.ok:
@@ -133,24 +129,39 @@ def generate_with_openrouter(
 
     data = response.json()
 
-    try:
-        content = data["choices"][0]["message"]["content"]
+    # Keep the actual OpenRouter response visible in logs
+    print("OpenRouter response:", data)
 
-    except (
-        KeyError,
-        IndexError,
-        TypeError
-    ):
+    choices = data.get("choices")
+
+    if not choices:
         raise RuntimeError(
-            f"Unexpected OpenRouter response: {data}"
+            f"OpenRouter returned no choices: {data}"
         )
 
-    if not content:
+    message = choices[0].get("message", {})
+    content = message.get("content")
+
+    # Some models may return content as a list
+    if isinstance(content, list):
+        text_parts = []
+
+        for part in content:
+            if isinstance(part, dict):
+                if part.get("type") == "text":
+                    text_parts.append(part.get("text", ""))
+                elif "text" in part:
+                    text_parts.append(part["text"])
+
+        content = "".join(text_parts)
+
+    if not content or not str(content).strip():
         raise RuntimeError(
-            "OpenRouter returned an empty response."
+            f"OpenRouter returned an empty response. "
+            f"Full response: {data}"
         )
 
-    return content.strip()
+    return str(content).strip()
 
 
 # ============================================================
