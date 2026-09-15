@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+
+load_dotenv()
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +14,8 @@ from backend.routes.study_plan import router as study_plan_router
 from backend.routes.chatbot import router as chatbot_router
 from backend.routes.auth import router as auth_router
 from backend.routes.academic_profile import router as academic_profile_router
+from backend.routes.feedback import router as feedback_router
+from backend.routes.feedback import initialize_feedback_table
 
 
 # ============================================================
@@ -29,6 +34,7 @@ app = FastAPI(
 # ============================================================
 
 initialize_database()
+initialize_feedback_table()
 
 
 # ============================================================
@@ -78,6 +84,8 @@ app.include_router(auth_router)
 app.include_router(
     academic_profile_router
 )
+
+app.include_router(feedback_router)
 
 
 # ============================================================
