@@ -6938,7 +6938,9 @@
     "description": "An accelerated introduction to computer science and programming using the Java language. Basic UNIX. Modularity and abstraction. Documentation, testing and verification techniques. Basic object-oriented programming, including inheritance and dynamic binding. Exception handling. Event-driven programming. Experience with AWT library or another similar library. Students who have completed CSE 8B may not take CSE 11. Students should consult the “CSE Course Placement Advice” web page for assistance in choosing which CSE course to take first. Recommended preparation: high school algebra and familiarity with computing concepts and a course in a compiled language. ** Exam placement options to enroll possible **",
     "prerequisites": [],
     "special_requirements": [],
-    "prerequisite_expression": NaN
+    "prerequisite_expression": NaN,
+    "resource_url": "https://ocw.mit.edu/courses/6-092-introduction-to-programming-in-java-january-iap-2010/",
+    "resource_label": "Free Java learning materials — MIT OpenCourseWare"
   },
   "CSE 110": {
     "name": "Software Engineering",
@@ -7035,7 +7037,9 @@
     "description": "Design and implementation of large, complex software systems involving multiple aspects of CSE curriculum. Emphasis is on software system design applied to a single, large group project with close interaction with instructor. ** Consent of instructor to enroll possible ** ** Upper-division standing required **",
     "prerequisites": [],
     "special_requirements": [],
-    "prerequisite_expression": NaN
+    "prerequisite_expression": NaN,
+    "resource_url": "https://ocw.mit.edu/courses/6-170-software-studio-spring-2013/",
+    "resource_label": "Free software design & engineering materials — MIT OpenCourseWare"
   },
   "CSE 127": {
     "name": "Introduction to Computer Security",
@@ -7181,7 +7185,9 @@
     "description": "Project class building an embedded computing system. Learn fundamental knowledge of microcontrollers, sensors, and actuators. Introduction to the hardware and software tools to build project in a team environment and end-to-end system building. ** Department approval required **",
     "prerequisites": [],
     "special_requirements": [],
-    "prerequisite_expression": NaN
+    "prerequisite_expression": NaN,
+    "resource_url": "https://nptel.ac.in/courses/108105057",
+    "resource_label": "Free Embedded Systems learning materials — NPTEL"
   },
   "CSE 148": {
     "name": "Advanced Processor Architecture Design Project",
@@ -7440,7 +7446,9 @@
     "description": "End-to-end system design of embedded electronic systems including PCB design and fabrication, software control system development, and system integration. Program or material fee may apply. May be coscheduled with CSE 276E. ** Department approval required **",
     "prerequisites": [],
     "special_requirements": [],
-    "prerequisite_expression": NaN
+    "prerequisite_expression": NaN,
+    "resource_url": "https://ocw.mit.edu/courses/2-12-introduction-to-robotics-fall-2005/",
+    "resource_label": "Free robotics learning materials — MIT OpenCourseWare"
   },
   "CSE 180": {
     "name": "Biology Meets Computing",
@@ -7528,35 +7536,45 @@
     "description": "Topics of special interest in computer science and engineering. Topics may vary from quarter to quarter. May be repeated for credit with the consent of instructor. ** Consent of instructor to enroll possible **",
     "prerequisites": [],
     "special_requirements": [],
-    "prerequisite_expression": NaN
+    "prerequisite_expression": NaN,
+    "resource_url": "https://ocw.mit.edu/search/?q=computer+science",
+    "resource_label": "Free Computer Science courses — MIT OpenCourseWare"
   },
   "CSE 191": {
     "name": "Seminar in CSE",
     "description": "A seminar course on topics of current interest. Students, as well as, the instructor will be actively involved in running the course/class. This course cannot be counted toward a technical elective. ** Consent of instructor to enroll possible **",
     "prerequisites": [],
     "special_requirements": [],
-    "prerequisite_expression": NaN
+    "prerequisite_expression": NaN,
+    "resource_url": "https://ocw.mit.edu/search/?q=computer+science",
+    "resource_label": "Free Computer Science courses — MIT OpenCourseWare"
   },
   "CSE 192": {
     "name": "Senior Seminar in Computer Science and Engineering",
     "description": "The Senior Seminar Program is designed to allow senior undergraduates to meet with faculty members in a small group setting to explore an intellectual topic in CSE (at the upper-division level). Topics will vary from quarter to quarter. Senior seminars may be taken for credit up to four times, with a change in topic, and permission of the department. Enrollment is limited to twenty students, with preference given to seniors. (P/NP grades only.) ** Consent of instructor to enroll possible **",
     "prerequisites": [],
     "special_requirements": [],
-    "prerequisite_expression": NaN
+    "prerequisite_expression": NaN,
+    "resource_url": "https://ocw.mit.edu/search/?q=computer+science",
+    "resource_label": "Free Computer Science courses — MIT OpenCourseWare"
   },
   "CSE 193": {
     "name": "Introduction to Computer Science Research",
     "description": "Introduction to research in computer science. Topics include defining a CS research problem, finding and reading technical papers, oral communication, technical writing, and independent learning. Course participants apprentice with a CSE research group and propose an original research project. ** Consent of instructor to enroll possible **",
     "prerequisites": [],
     "special_requirements": [],
-    "prerequisite_expression": NaN
+    "prerequisite_expression": NaN,
+    "resource_url": "https://ocw.mit.edu/search/?q=computer+science+research",
+    "resource_label": "Free Computer Science research materials — MIT OpenCourseWare"
   },
   "CSE 195": {
     "name": "Teaching",
     "description": "Teaching and tutorial assistance in a CSE course under the supervision of the instructor. (P/NP grades only.) ** Consent of instructor to enroll possible **",
     "prerequisites": [],
     "special_requirements": [],
-    "prerequisite_expression": NaN
+    "prerequisite_expression": NaN,
+    "resource_url": "https://ocw.mit.edu/search/?q=teaching+computer+science",
+    "resource_label": "Free teaching & Computer Science materials — MIT OpenCourseWare"
   },
   "CSE 197": {
     "name": "Field Study in Computer Science and Engineering",

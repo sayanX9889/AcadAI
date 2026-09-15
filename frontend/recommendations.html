@@ -434,6 +434,51 @@
         requireLogin();
 
 
+        // =========================================================
+        // FREE EXTERNAL LEARNING RESOURCES
+        // These are curated links for the synthetic course codes
+        // shown by AcadAI. The AI does NOT generate these URLs.
+        // =========================================================
+
+        const COURSE_RESOURCES = {
+            "CSE 11": {
+                label: "Free Java Learning Materials",
+                url: "https://ocw.mit.edu/courses/6-092-introduction-to-programming-in-java-january-iap-2010/"
+            },
+            "CSE 125": {
+                label: "Free Software Design & Engineering Materials",
+                url: "https://ocw.mit.edu/courses/6-170-software-studio-spring-2013/"
+            },
+            "CSE 145": {
+                label: "Free Embedded-Systems Learning Materials",
+                url: "https://www.nptel.ac.in/courses/106105159"
+            },
+            "CSE 176E": {
+                label: "Free Robotics Learning Materials",
+                url: "https://ocw.mit.edu/courses/2-12-introduction-to-robotics-fall-2005/"
+            },
+            "CSE 190": {
+                label: "Browse Free Computer-Science Courses",
+                url: "https://ocw.mit.edu/search/?d=Electrical%20Engineering%20and%20Computer%20Science"
+            },
+            "CSE 191": {
+                label: "Browse Free CSE Seminars & Courses",
+                url: "https://ocw.mit.edu/search/?d=Electrical%20Engineering%20and%20Computer%20Science"
+            },
+            "CSE 192": {
+                label: "Browse Free Computer-Science Courses",
+                url: "https://ocw.mit.edu/search/?d=Electrical%20Engineering%20and%20Computer%20Science"
+            },
+            "CSE 193": {
+                label: "Free Research-Oriented CS Materials",
+                url: "https://ocw.mit.edu/courses/6-883-program-analysis-fall-2005/"
+            },
+            "CSE 195": {
+                label: "Free Teaching & Higher-Education Materials",
+                url: "https://www.ocw.mit.edu/courses/5-95j-teaching-college-level-science-and-engineering-fall-2015/"
+            }
+        };
+
 
         async function loadRecommendations() {
 
@@ -702,6 +747,27 @@
                             >
                                 ${recommendation.message}
                             </p>
+
+
+                            ${COURSE_RESOURCES[recommendation.course_code]
+                                    ? `
+                                    <div class="mt-5">
+                                        <a
+                                            href="${COURSE_RESOURCES[recommendation.course_code].url}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3.5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                        >
+                                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            ${COURSE_RESOURCES[recommendation.course_code].label}
+                                        </a>
+                                        <p class="mt-2 text-[11px] text-slate-400">
+                                            External free learning resource. No payment is required to access the listed materials.
+                                        </p>
+                                    </div>
+                                  `
+                                    : ""
+                                }
 
 
                             ${recommendation.prerequisites
