@@ -1,8 +1,7 @@
-import ollama
 import json
 
+from backend.services.model_service import generate_ai_response
 
-MODEL_NAME = "llama3.2:1b"
 
 
 def generate_ai_study_plan(
@@ -58,22 +57,7 @@ Do not change the allocated hours.
 """
 
 
-    response = ollama.chat(
-        model=MODEL_NAME,
-        messages=[
-            {
-                "role": "system",
-                "content": system_prompt
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        options={
-            "temperature": 0.2
-        }
+    return generate_ai_response(
+        prompt=prompt,
+        system_prompt=system_prompt
     )
-
-
-    return response["message"]["content"].strip()

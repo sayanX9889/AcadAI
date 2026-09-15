@@ -88,8 +88,8 @@
                     </a>
 
                     <a href="feedback.html"
-            class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
-              class="fa-solid fa-calendar-check w-5 text-center"></i>Feedback</a>
+                        class="flex items-center gap-3 rounded-lg px-3.5 py-3 text-sm font-medium transition hover:bg-slate-800 hover:text-white"><i
+                            class="fa-solid fa-calendar-check w-5 text-center"></i>Feedback</a>
 
 
                     <!-- ACTIVE -->
@@ -915,10 +915,19 @@
                         "ai"
                     );
 
+                } else if (data.error) {
+
+                    console.error("Backend AI error:", data);
+
+                    addMessage(
+                        `AI Error: ${data.details || data.error}`,
+                        "ai"
+                    );
+
                 } else {
 
                     addMessage(
-                        "I received an empty response from the AI.",
+                        "The AI returned an unexpected response.",
                         "ai"
                     );
 
