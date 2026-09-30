@@ -371,17 +371,17 @@ def hash_reset_value(value: str) -> str:
 
 
 def send_password_reset_email(email: str, otp: str):
-    gmail_address = os.getenv("SMTP_EMAIL")
-    gmail_app_password = os.getenv("SMTP_APP_PASSWORD")
+    smtp_email = os.getenv("SMTP_EMAIL")
+    smtp_app_password = os.getenv("SMTP_APP_PASSWORD")
 
-    if not gmail_address or not gmail_app_password:
+    if not smtp_email or not smtp_app_password:
         raise RuntimeError(
             "SMTP_EMAIL and SMTP_APP_PASSWORD are not configured."
         )
 
     message = EmailMessage()
     message["Subject"] = "AcadAI Password Reset Code"
-    message["From"] = gmail_address
+    message["From"] = smtp_email
     message["To"] = email
     message.set_content(
         f"""Hello,
@@ -403,7 +403,7 @@ AcadAI
 
     with smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as smtp:
         smtp.starttls()
-        smtp.login(gmail_address, gmail_app_password)
+        smtp.login(smtp_email, smtp_app_password)
         smtp.send_message(message)
 
 
