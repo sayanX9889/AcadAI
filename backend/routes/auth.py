@@ -30,6 +30,7 @@ import secrets
 import os
 import re
 import smtplib
+import traceback
 from email.message import EmailMessage
 from datetime import timedelta
 
@@ -371,12 +372,26 @@ def hash_reset_value(value: str) -> str:
 
 
 def send_password_reset_email(email: str, otp: str):
-    smtp_email = os.getenv("SMTP_EMAIL")
-    smtp_app_password = os.getenv("SMTP_APP_PASSWORD")
+    # Primary names used by the password-reset system.
+    # GMAIL_* are supported as a fallback so older deployments do not break.
+    smtp_email = (
+        os.getenv("SMTP_EMAIL")
+        or os.getenv("GMAIL_ADDRESS")
+        or ""
+    ).strip()
+
+    # Google displays app passwords in groups separated by spaces.
+    # Removing spaces makes the value safe for SMTP authentication.
+    smtp_app_password = (
+        os.getenv("SMTP_APP_PASSWORD")
+        or os.getenv("GMAIL_APP_PASSWORD")
+        or ""
+    ).replace(" ", "").strip()
 
     if not smtp_email or not smtp_app_password:
         raise RuntimeError(
-            "SMTP_EMAIL and SMTP_APP_PASSWORD are not configured."
+            "SMTP email credentials are missing. Set SMTP_EMAIL and "
+            "SMTP_APP_PASSWORD in the deployment environment."
         )
 
     message = EmailMessage()
@@ -401,8 +416,16 @@ AcadAI
 """
     )
 
-    with smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as smtp:
+    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com").strip()
+    try:
+        smtp_port = int(os.getenv("SMTP_PORT", "587"))
+    except ValueError:
+        smtp_port = 587
+
+    with smtplib.SMTP(smtp_host, smtp_port, timeout=30) as smtp:
+        smtp.ehlo()
         smtp.starttls()
+        smtp.ehlo()
         smtp.login(smtp_email, smtp_app_password)
         smtp.send_message(message)
 
@@ -476,8 +499,12 @@ def forgot_password(request: ForgotPasswordRequest):
 
         try:
             send_password_reset_email(email, otp)
-        except Exception:
-            # Do not leave a usable code when delivery failed.
+        except Exception as e:
+            print("PASSWORD RESET EMAIL ERROR:")
+            print(repr(e))
+            traceback.print_exc()
+
+            # Do not leave a usable reset code when email delivery fails.
             cursor.execute(
                 """
                 UPDATE email_verifications
@@ -487,6 +514,7 @@ def forgot_password(request: ForgotPasswordRequest):
                 (user["student_id"], otp_hash)
             )
             connection.commit()
+
             raise HTTPException(
                 status_code=500,
                 detail="Unable to send password reset email. Please try again later."
@@ -502,13 +530,15 @@ def forgot_password(request: ForgotPasswordRequest):
         raise
     except Exception as error:
         connection.rollback()
+        print("PASSWORD RESET PROCESS ERROR:")
+        print(repr(error))
+        traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail=f"Unable to process password reset request: {error}"
+            detail="Unable to process password reset request. Please try again later."
         )
     finally:
         connection.close()
-
 
 @router.post("/verify-reset-code")
 def verify_reset_code(request: VerifyResetCodeRequest):
