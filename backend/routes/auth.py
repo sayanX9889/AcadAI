@@ -1233,27 +1233,33 @@ async def upload_profile_picture(
 
 @router.delete("/account/{student_id}")
 def delete_account(student_id: str):
+    """
+    Permanently delete a student's account and student-owned data.
 
-    student_id = (
-        student_id
-        .strip()
-        .upper()
-    )
+    This removes:
+      - the users row
+      - every other table containing a student_id column
+      - the student's Cloudinary profile picture
+      - old local profile-picture files, if present
+
+    The database cleanup is performed inside one transaction.
+    """
+
+    student_id = student_id.strip().upper()
 
     connection = get_connection()
     cursor = connection.cursor()
 
+    old_picture = None
+    deleted_tables = []
+
     try:
-
-        # ----------------------------------------------------
-        # CHECK ACCOUNT AND GET PROFILE PICTURE
-        # ----------------------------------------------------
-
+        # --------------------------------------------------------
+        # CHECK ACCOUNT + SAVE PROFILE PICTURE REFERENCE
+        # --------------------------------------------------------
         cursor.execute(
             """
-            SELECT
-                id,
-                profile_picture
+            SELECT id, profile_picture
             FROM users
             WHERE student_id = ?
             """,
@@ -1270,97 +1276,70 @@ def delete_account(student_id: str):
 
         old_picture = user["profile_picture"]
 
-        # ----------------------------------------------------
-        # DELETE USER-OWNED DATA
-        #
-        # academic_profiles, academic_subjects and
-        # academic_semesters already use ON DELETE CASCADE
-        # through users(student_id).
-        #
-        # notifications, feedback and email_verifications
-        # are explicitly deleted here for a complete cleanup.
-        # ----------------------------------------------------
-
-        # Notifications
+        # --------------------------------------------------------
+        # FIND EVERY USER-OWNED TABLE
+        # --------------------------------------------------------
+        # Any public table containing a student_id column is treated
+        # as student-owned. This prevents new student-data tables from
+        # accidentally surviving account deletion.
         cursor.execute(
             """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                AND table_name = 'notifications'
-            ) AS table_exists
+            SELECT table_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND column_name = 'student_id'
+              AND table_name <> 'users'
+            ORDER BY table_name
             """
         )
 
-        notifications_table = cursor.fetchone()
+        student_tables = [
+            row["table_name"]
+            for row in cursor.fetchall()
+        ]
 
-        if notifications_table and notifications_table["table_exists"]:
-            cursor.execute(
-                """
-                DELETE FROM notifications
-                WHERE student_id = ?
-                """,
-                (student_id,)
-            )
+        # --------------------------------------------------------
+        # DELETE CHILD DATA FIRST
+        # --------------------------------------------------------
+        # Try tables repeatedly so foreign-key-dependent tables are
+        # deleted before their parent student-owned tables.
+        remaining = list(student_tables)
+        last_error = None
 
-        # Feedback
-        cursor.execute(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                AND table_name = 'feedback'
-            ) AS table_exists
-            """
-        )
+        while remaining:
+            progress = False
+            next_remaining = []
 
-        feedback_table = cursor.fetchone()
+            for table_name in remaining:
+                try:
+                    # table_name comes directly from PostgreSQL's
+                    # information_schema, never from user input.
+                    cursor.execute(
+                        f'DELETE FROM "{table_name}" WHERE student_id = ?',
+                        (student_id,)
+                    )
+                    deleted_tables.append(table_name)
+                    progress = True
 
-        if feedback_table and feedback_table["table_exists"]:
-            cursor.execute(
-                """
-                DELETE FROM feedback
-                WHERE student_id = ?
-                """,
-                (student_id,)
-            )
+                except Exception as error:
+                    # A foreign-key dependency may require another
+                    # student-owned table to be deleted first.
+                    next_remaining.append(table_name)
+                    last_error = error
+                    connection.rollback()
 
-        # Email verification
-        cursor.execute(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                AND table_name = 'email_verifications'
-            ) AS table_exists
-            """
-        )
+            if not progress:
+                raise RuntimeError(
+                    "Unable to remove all student-owned database records. "
+                    f"Remaining tables: {', '.join(next_remaining)}. "
+                    f"Last database error: {last_error}"
+                )
 
-        email_verifications_table = cursor.fetchone()
+            remaining = next_remaining
 
-        if email_verifications_table and email_verifications_table["table_exists"]:
-            cursor.execute(
-                """
-                DELETE FROM email_verifications
-                WHERE student_id = ?
-                """,
-                (student_id,)
-            )
-
-        # ----------------------------------------------------
-        # DELETE USER
-        #
-        # This automatically removes:
-        #   - academic_profiles
-        #   - academic_subjects
-        #   - academic_semesters
-        #
-        # because their foreign keys use ON DELETE CASCADE.
-        # ----------------------------------------------------
-
+        # --------------------------------------------------------
+        # DELETE MAIN USER RECORD
+        # --------------------------------------------------------
         cursor.execute(
             """
             DELETE FROM users
@@ -1375,61 +1354,56 @@ def delete_account(student_id: str):
                 detail="Student account not found."
             )
 
-        # ----------------------------------------------------
-        # COMMIT DATABASE CLEANUP FIRST
-        # ----------------------------------------------------
-
+        # --------------------------------------------------------
+        # COMMIT DATABASE DELETION
+        # --------------------------------------------------------
         connection.commit()
 
-        # ----------------------------------------------------
-        # DELETE PROFILE PICTURE
-        #
-        # New pictures are stored on Cloudinary. Older accounts
-        # may still contain a local filename, so support both.
-        # ----------------------------------------------------
-
-        profile_picture_deleted = True
-
-        if old_picture:
-            old_picture_value = str(old_picture).strip()
-
-            if old_picture_value.startswith(("http://", "https://")):
-                # New Cloudinary-backed picture.
-                profile_picture_deleted = _delete_cloudinary_picture(
-                    student_id
-                )
-
-            else:
-                # Backward compatibility for old Render-local pictures.
-                old_path = PROFILE_DIR / old_picture_value
-
-                try:
-                    if old_path.exists() and old_path.is_file():
-                        old_path.unlink()
-                except OSError:
-                    profile_picture_deleted = False
-
-        return {
-            "success": True,
-            "message": "Account and all associated data deleted successfully.",
-            "student_id": student_id,
-            "profile_picture_deleted": profile_picture_deleted
-        }
-
     except HTTPException:
-
         connection.rollback()
         raise
 
     except Exception as error:
-
         connection.rollback()
+        print("DELETE ACCOUNT ERROR:")
+        print(repr(error))
+        traceback.print_exc()
 
         raise HTTPException(
             status_code=500,
-            detail=f"Unable to delete account: {error}"
+            detail="Unable to completely delete the account. No database changes were kept."
         )
 
     finally:
-
         connection.close()
+
+    # ------------------------------------------------------------
+    # DELETE PROFILE PICTURE AFTER DATABASE SUCCESS
+    # ------------------------------------------------------------
+    profile_picture_deleted = True
+
+    if old_picture:
+        old_picture_value = str(old_picture).strip()
+
+        if old_picture_value.startswith(("http://", "https://")):
+            # Cloudinary public_id is deterministic from student_id.
+            profile_picture_deleted = _delete_cloudinary_picture(
+                student_id
+            )
+        else:
+            # Backward compatibility for old Render-local pictures.
+            old_path = PROFILE_DIR / old_picture_value
+
+            try:
+                if old_path.exists() and old_path.is_file():
+                    old_path.unlink()
+            except OSError:
+                profile_picture_deleted = False
+
+    return {
+        "success": True,
+        "message": "Account and all associated student data deleted successfully.",
+        "student_id": student_id,
+        "profile_picture_deleted": profile_picture_deleted,
+        "database_cleanup": "complete"
+    }
