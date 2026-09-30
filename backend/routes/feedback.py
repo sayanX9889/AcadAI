@@ -1,8 +1,7 @@
 from datetime import datetime, timezone
 import logging
 import os
-import smtplib
-from email.message import EmailMessage
+import resend
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -22,27 +21,21 @@ def send_feedback_email(
     created_at: str,
     feedback_id: int,
 ):
-    """Send a feedback notification to the configured Gmail address.
+    """Send a feedback notification using the Resend API.
 
-    Email failure is logged but does not cancel a successfully saved feedback
-    submission. This prevents a temporary Gmail/SMTP problem from losing feedback.
+    The feedback is sent from and to Resend's default testing address.
+    Email failure is logged but does not cancel a successfully saved
+    feedback submission.
     """
-    smtp_email = os.getenv("SMTP_EMAIL")
-    smtp_app_password = os.getenv("SMTP_APP_PASSWORD")
-    feedback_receiver = os.getenv("FEEDBACK_RECEIVER")
+    resend_api_key = os.getenv("RESEND_API_KEY")
 
-    if not smtp_email or not smtp_app_password or not feedback_receiver:
+    if not resend_api_key:
         logger.warning(
-            "Gmail notification skipped: SMTP_EMAIL, SMTP_APP_PASSWORD, "
-            "or FEEDBACK_RECEIVER is not configured."
+            "Resend notification skipped: RESEND_API_KEY is not configured."
         )
         return False
 
-    # Remove normal and hidden whitespace from the Gmail App Password.
-    smtp_app_password = "".join(
-    character for character in smtp_app_password
-    if not character.isspace()
-)
+    resend.api_key = resend_api_key
 
     stars = "⭐" * rating
     subject = f"New AcadAI Feedback - {rating}/5"
@@ -61,26 +54,24 @@ Student Email: {email or "Not provided"}
 Submitted At (UTC): {created_at}
 """
 
-    msg = EmailMessage()
-    msg["From"] = smtp_email
-    msg["To"] = feedback_receiver
-    msg["Subject"] = subject
-    msg.set_content(body)
-
     try:
-        with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(smtp_email, smtp_app_password)
-            server.send_message(msg)
+        response = resend.Emails.send({
+            "from": "onboarding@resend.dev",
+            "to": ["onboarding@resend.dev"],
+            "subject": subject,
+            "text": body,
+        })
 
-        logger.info("Feedback email sent successfully for feedback ID %s", feedback_id)
+        logger.info(
+            "Feedback email sent successfully for feedback ID %s (Resend ID: %s)",
+            feedback_id,
+            response.get("id") if isinstance(response, dict) else response,
+        )
         return True
 
     except Exception:
         logger.exception(
-            "Unable to send Gmail notification for feedback ID %s",
+            "Unable to send Resend notification for feedback ID %s",
             feedback_id,
         )
         return False
