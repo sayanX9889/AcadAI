@@ -58,124 +58,10 @@ function setDefaultProfilePicture() {
 async function loadStudentProfile() {
 
     if (!STUDENT_ID) {
-        return null;
+        return;
     }
 
     try {
-
-        // ----------------------------------
-        // Load academic student information
-        // ----------------------------------
-
-        const studentResponse =
-            await fetch(
-                `${API_URL}/students/${STUDENT_ID}`
-            );
-
-        if (!studentResponse.ok) {
-
-            throw new Error(
-                `Student API returned ${studentResponse.status}`
-            );
-        }
-
-        const student =
-            await studentResponse.json();
-
-        if (student.error) {
-
-            throw new Error(
-                student.error
-            );
-        }
-
-
-        // ----------------------------------
-        // Student name
-        // ----------------------------------
-
-        const nameElements =
-            document.querySelectorAll(
-                "#sidebar-student-name"
-            );
-
-        nameElements.forEach(function (element) {
-
-            element.textContent =
-                student.name || "Student";
-
-        });
-
-
-        // ----------------------------------
-        // Student ID
-        // ----------------------------------
-
-        const idElements =
-            document.querySelectorAll(
-                "#sidebar-student-id"
-            );
-
-        idElements.forEach(function (element) {
-
-            element.textContent =
-                student.student_id ||
-                STUDENT_ID;
-
-        });
-
-
-        // ----------------------------------
-        // Semester
-        // ----------------------------------
-
-        const semesterElements =
-            document.querySelectorAll(
-                "#student-semester"
-            );
-
-        semesterElements.forEach(function (element) {
-
-            if (
-                student.current_semester !==
-                undefined
-            ) {
-
-                element.textContent =
-                    student.current_semester;
-            }
-
-        });
-
-
-        // ----------------------------------
-        // Footer semester
-        // ----------------------------------
-
-        const footerSemesterElements =
-            document.querySelectorAll(
-                "#footer-semester"
-            );
-
-        footerSemesterElements.forEach(
-            function (element) {
-
-                if (
-                    student.current_semester !==
-                    undefined
-                ) {
-
-                    element.textContent =
-                        student.current_semester;
-                }
-
-            }
-        );
-
-
-        // ----------------------------------
-        // Load account/profile information
-        // ----------------------------------
 
         const profileResponse =
             await fetch(
@@ -198,6 +84,7 @@ async function loadStudentProfile() {
                     ".student-profile-image"
                 );
 
+
             profileImages.forEach(
                 function (image) {
 
@@ -205,9 +92,65 @@ async function loadStudentProfile() {
                         profile.profile_picture
                     ) {
 
-                        image.src =
-                            API_URL +
-                            profile.profile_picture;
+                        const profilePicture =
+                            String(
+                                profile.profile_picture
+                            ).trim();
+
+
+                        /*
+                         * Cloudinary returns a complete
+                         * HTTPS URL.
+                         *
+                         * Example:
+                         * https://res.cloudinary.com/...
+                         *
+                         * Use Cloudinary URLs directly.
+                         */
+
+                        if (
+                            profilePicture.startsWith("http://") ||
+                            profilePicture.startsWith("https://")
+                        ) {
+
+                            image.src =
+                                profilePicture;
+
+                        }
+
+                        /*
+                         * Backward compatibility for
+                         * old Render/local profile pictures.
+                         */
+
+                        else {
+
+                            image.src =
+                                API_URL +
+                                (
+                                    profilePicture.startsWith("/")
+                                        ? profilePicture
+                                        : "/" + profilePicture
+                                );
+
+                        }
+
+
+                        /*
+                         * If the image cannot be loaded,
+                         * show the default avatar instead
+                         * of a broken-image icon.
+                         */
+
+                        image.onerror =
+                            function () {
+
+                                this.onerror = null;
+
+                                this.src =
+                                    "https://ui-avatars.com/api/?name=Student&background=e0e7ff&color=4f46e5&size=128";
+
+                            };
 
                     }
 
@@ -223,21 +166,118 @@ async function loadStudentProfile() {
 
 
             // ------------------------------
-            // Account name
+            // Student name
             // ------------------------------
 
-            const accountNameElements =
+            const studentNameElements =
                 document.querySelectorAll(
-                    "#sidebar-student-name"
+                    ".student-name"
                 );
 
-            accountNameElements.forEach(
+
+            studentNameElements.forEach(
                 function (element) {
 
-                    if (profile.full_name) {
+                    if (profile.name) {
 
                         element.textContent =
-                            profile.full_name;
+                            profile.name;
+
+                    }
+
+                }
+            );
+
+
+            // ------------------------------
+            // Student ID
+            // ------------------------------
+
+            const studentIdElements =
+                document.querySelectorAll(
+                    ".student-id"
+                );
+
+
+            studentIdElements.forEach(
+                function (element) {
+
+                    if (profile.student_id) {
+
+                        element.textContent =
+                            profile.student_id;
+
+                    }
+
+                }
+            );
+
+
+            // ------------------------------
+            // Email
+            // ------------------------------
+
+            const studentEmailElements =
+                document.querySelectorAll(
+                    ".student-email"
+                );
+
+
+            studentEmailElements.forEach(
+                function (element) {
+
+                    if (profile.email) {
+
+                        element.textContent =
+                            profile.email;
+
+                    }
+
+                }
+            );
+
+
+            // ------------------------------
+            // Department
+            // ------------------------------
+
+            const studentDepartmentElements =
+                document.querySelectorAll(
+                    ".student-department"
+                );
+
+
+            studentDepartmentElements.forEach(
+                function (element) {
+
+                    if (profile.department) {
+
+                        element.textContent =
+                            profile.department;
+
+                    }
+
+                }
+            );
+
+
+            // ------------------------------
+            // Year
+            // ------------------------------
+
+            const studentYearElements =
+                document.querySelectorAll(
+                    ".student-year"
+                );
+
+
+            studentYearElements.forEach(
+                function (element) {
+
+                    if (profile.year) {
+
+                        element.textContent =
+                            profile.year;
 
                     }
 
@@ -246,23 +286,17 @@ async function loadStudentProfile() {
 
         }
 
-
-        return student;
-
     }
 
     catch (error) {
 
         console.error(
-            "Student profile loading error:",
+            "Unable to load student profile:",
             error
         );
 
-        // Don't leave broken images
-        setDefaultProfilePicture();
-
-        return null;
     }
+
 }
 
 
@@ -277,15 +311,21 @@ function logout() {
     );
 
     localStorage.removeItem(
-        "student_name"
+        "student_profile"
     );
 
     localStorage.removeItem(
-        "student_email"
+        "token"
     );
+
+    localStorage.removeItem(
+        "access_token"
+    );
+
 
     window.location.href =
         "login.html";
+
 }
 
 
@@ -295,239 +335,107 @@ function logout() {
 
 async function deleteAccount() {
 
-    const studentId =
-        localStorage.getItem(
-            "student_id"
-        );
-
-    if (!studentId) {
+    if (!STUDENT_ID) {
 
         alert(
-            "No logged-in account was found."
+            "No logged-in student found."
         );
 
         return;
+
     }
 
 
-    // ----------------------------------
-    // CONFIRMATION
-    // ----------------------------------
-
-    const confirmation =
+    const confirmed =
         confirm(
-            "Are you sure you want to permanently delete your account?\n\n" +
-            "This will delete your login account, academic profile, subjects, " +
-            "semester data, and profile picture.\n\n" +
-            "This action cannot be undone."
+            "Are you sure you want to permanently delete your account? This action cannot be undone."
         );
 
 
-    if (!confirmation) {
-
+    if (!confirmed) {
         return;
     }
 
 
     try {
 
-        console.log(
-            "Deleting account:",
-            studentId
-        );
-
-
-        // ----------------------------------
-        // DELETE ACCOUNT API
-        // ----------------------------------
-
         const response =
             await fetch(
-                `${API_URL}/auth/account/${encodeURIComponent(studentId)}`,
+                `${API_URL}/auth/delete-account/${STUDENT_ID}`,
                 {
-                    method: "DELETE",
-
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    }
+                    method: "DELETE"
                 }
             );
 
-
-        console.log(
-            "Delete response status:",
-            response.status
-        );
-
-
-        // ----------------------------------
-        // READ RESPONSE
-        // ----------------------------------
 
         const data =
             await response.json();
 
 
-        console.log(
-            "Delete response:",
-            data
-        );
-
-
-        // ----------------------------------
-        // SERVER ERROR
-        // ----------------------------------
-
         if (!response.ok) {
 
             throw new Error(
                 data.detail ||
-                data.error ||
-                `Server returned ${response.status}`
+                "Unable to delete account."
             );
+
         }
 
-
-        // ----------------------------------
-        // DELETE FAILED
-        // ----------------------------------
-
-        if (!data.success) {
-
-            throw new Error(
-                data.message ||
-                "Account deletion failed."
-            );
-        }
-
-
-        // ----------------------------------
-        // CLEAR LOGIN INFORMATION
-        // ----------------------------------
 
         localStorage.removeItem(
             "student_id"
         );
 
         localStorage.removeItem(
-            "student_name"
+            "student_profile"
         );
 
         localStorage.removeItem(
-            "student_email"
+            "token"
         );
 
+        localStorage.removeItem(
+            "access_token"
+        );
 
-        // ----------------------------------
-        // CLEAR SESSION STORAGE
-        // ----------------------------------
-
-        sessionStorage.clear();
-
-
-        // ----------------------------------
-        // SUCCESS MESSAGE
-        // ----------------------------------
 
         alert(
             "Your account has been deleted successfully."
         );
 
 
-        // ----------------------------------
-        // RETURN TO LOGIN
-        // ----------------------------------
-
-        window.location.replace(
-            "login.html"
-        );
+        window.location.href =
+            "login.html";
 
     }
 
     catch (error) {
 
         console.error(
-            "ACCOUNT DELETE ERROR:",
+            "Account deletion error:",
             error
         );
 
 
         alert(
-            "Unable to delete your account.\n\n" +
-            error.message
+            error.message ||
+            "Unable to delete account."
         );
+
     }
+
 }
 
 
 // ==========================================
-// MAKE FUNCTIONS AVAILABLE TO HTML
-// ==========================================
-//
-// Required because dashboard.html uses:
-//
-// onclick="deleteAccount()"
-// onclick="logout()"
-//
-// ==========================================
-
-window.deleteAccount =
-    deleteAccount;
-
-window.logout =
-    logout;
-
-
-// ==========================================
-// PAGE INITIALIZATION
+// INITIALIZE AUTH
 // ==========================================
 
 document.addEventListener(
     "DOMContentLoaded",
-    async function () {
+    function () {
 
-
-        // ----------------------------------
-        // CURRENT PAGE
-        // ----------------------------------
-
-        const currentPage =
-            window.location.pathname
-                .split("/")
-                .pop();
-
-
-        // ----------------------------------
-        // LOGIN/SIGNUP PAGES
-        // DO NOT REQUIRE AUTHENTICATION
-        // ----------------------------------
-
-        if (
-            currentPage === "login.html" ||
-            currentPage === "signup.html" ||
-            currentPage === ""
-        ) {
-
-            return;
-        }
-
-
-        // ----------------------------------
-        // PROTECT OTHER PAGES
-        // ----------------------------------
-
-        if (!requireLogin()) {
-
-            return;
-        }
-
-
-        // ----------------------------------
-        // LOAD PROFILE
-        // ----------------------------------
-
-        await loadStudentProfile();
+        loadStudentProfile();
 
     }
 );
