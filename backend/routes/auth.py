@@ -5,7 +5,7 @@ from fastapi import (
     HTTPException
 )
 from pathlib import Path
-import uuid
+import io
 PROFILE_DIR = Path(
     "data/profile_pictures"
 )
@@ -22,6 +22,48 @@ ALLOWED_IMAGE_TYPES = {
 }
 
 MAX_PROFILE_SIZE = 5 * 1024 * 1024
+
+CLOUDINARY_FOLDER = "acadai/profile_pictures"
+
+
+def _cloudinary_public_id(student_id: str) -> str:
+    return f"{CLOUDINARY_FOLDER}/{student_id}"
+
+
+def _configure_cloudinary() -> None:
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME", "").strip()
+    api_key = os.getenv("CLOUDINARY_API_KEY", "").strip()
+    api_secret = os.getenv("CLOUDINARY_API_SECRET", "").strip()
+
+    if not cloud_name or not api_key or not api_secret:
+        raise RuntimeError(
+            "Cloudinary is not configured. Set CLOUDINARY_CLOUD_NAME, "
+            "CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET."
+        )
+
+    cloudinary.config(
+        cloud_name=cloud_name,
+        api_key=api_key,
+        api_secret=api_secret,
+        secure=True,
+    )
+
+
+def _delete_cloudinary_picture(student_id: str) -> bool:
+    try:
+        _configure_cloudinary()
+
+        result = cloudinary.uploader.destroy(
+            _cloudinary_public_id(student_id),
+            resource_type="image",
+            invalidate=True,
+        )
+
+        return result.get("result") in {"ok", "not found"}
+
+    except Exception:
+        traceback.print_exc()
+        return False
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 import hashlib
@@ -31,6 +73,9 @@ import os
 import re
 import traceback
 import json
+
+import cloudinary
+import cloudinary.uploader
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 from datetime import timedelta
@@ -854,11 +899,18 @@ def get_profile(student_id: str):
     profile_picture = None
 
     if user["profile_picture"]:
+        stored_picture = str(user["profile_picture"]).strip()
 
-        profile_picture = (
-            "/uploads/profile_pictures/"
-            + user["profile_picture"]
-        )
+        # New profile pictures are stored as permanent Cloudinary URLs.
+        if stored_picture.startswith(("http://", "https://")):
+            profile_picture = stored_picture
+        else:
+            # Backward compatibility for old pictures that were stored
+            # on the Render filesystem.
+            profile_picture = (
+                "/uploads/profile_pictures/"
+                + stored_picture
+            )
 
 
     return {
@@ -964,89 +1016,110 @@ async def upload_profile_picture(
 
 
     # --------------------------------------------------------
-    # DELETE OLD PICTURE
+    # GET OLD PICTURE
     # --------------------------------------------------------
 
     old_picture = user["profile_picture"]
 
-    if old_picture:
+    # --------------------------------------------------------
+    # UPLOAD NEW PICTURE TO CLOUDINARY
+    # --------------------------------------------------------
 
-        old_path = (
-            PROFILE_DIR / old_picture
+    try:
+        _configure_cloudinary()
+
+        cloudinary_result = cloudinary.uploader.upload(
+            io.BytesIO(image_data),
+            resource_type="image",
+            public_id=_cloudinary_public_id(student_id),
+            overwrite=True,
+            invalidate=True,
         )
 
-        if old_path.exists():
+        profile_picture_url = cloudinary_result.get("secure_url")
 
-            old_path.unlink()
+        if not profile_picture_url:
+            raise RuntimeError(
+                "Cloudinary upload succeeded but did not return a secure URL."
+            )
 
+    except Exception as error:
+        connection.close()
+        print("CLOUDINARY PROFILE PICTURE UPLOAD ERROR:")
+        print(repr(error))
+        traceback.print_exc()
 
-    # --------------------------------------------------------
-    # CREATE NEW FILE NAME
-    # --------------------------------------------------------
-
-    extension = ALLOWED_IMAGE_TYPES[
-        file.content_type
-    ]
-
-    filename = (
-        student_id
-        + "_"
-        + uuid.uuid4().hex
-        + extension
-    )
-
-
-    file_path = (
-        PROFILE_DIR / filename
-    )
-
-
-    # --------------------------------------------------------
-    # SAVE IMAGE
-    # --------------------------------------------------------
-
-    with open(
-        file_path,
-        "wb"
-    ) as image_file:
-
-        image_file.write(
-            image_data
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to upload profile picture. Please try again later."
         )
 
-
     # --------------------------------------------------------
-    # SAVE FILE NAME IN DATABASE
+    # SAVE CLOUDINARY URL IN DATABASE
     # --------------------------------------------------------
 
-    cursor.execute(
-        """
-        UPDATE users
-        SET profile_picture = ?
-        WHERE student_id = ?
-        """,
-        (
-            filename,
-            student_id
+    try:
+        cursor.execute(
+            """
+            UPDATE users
+            SET profile_picture = ?
+            WHERE student_id = ?
+            """,
+            (
+                profile_picture_url,
+                student_id
+            )
         )
-    )
 
+        if cursor.rowcount != 1:
+            raise RuntimeError("Student account could not be updated.")
 
-    connection.commit()
+        connection.commit()
+
+    except Exception as error:
+        connection.rollback()
+        connection.close()
+
+        # The Cloudinary upload succeeded but the database update failed.
+        # Remove the new image so we don't leave an orphaned cloud asset.
+        _delete_cloudinary_picture(student_id)
+
+        print("PROFILE PICTURE DATABASE UPDATE ERROR:")
+        print(repr(error))
+        traceback.print_exc()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to save profile picture. Please try again later."
+        )
 
     connection.close()
 
+    # --------------------------------------------------------
+    # CLEAN UP OLD LOCAL PICTURE, IF THIS USER HAD ONE
+    # --------------------------------------------------------
+
+    # Old versions of the application stored only a filename in the
+    # database and saved the actual file under data/profile_pictures.
+    # Keep this cleanup for backward compatibility.
+    if old_picture:
+        old_picture_value = str(old_picture).strip()
+
+        if not old_picture_value.startswith(("http://", "https://")):
+            old_path = PROFILE_DIR / old_picture_value
+
+            try:
+                if old_path.exists() and old_path.is_file():
+                    old_path.unlink()
+            except OSError:
+                print(
+                    f"Unable to remove old local profile picture: {old_path}"
+                )
 
     return {
-
         "success": True,
-
-        "message":
-            "Profile picture updated successfully.",
-
-        "profile_picture":
-            "/uploads/profile_pictures/"
-            + filename
+        "message": "Profile picture updated successfully.",
+        "profile_picture": profile_picture_url
     }
 
 # ============================================================
@@ -1204,26 +1277,32 @@ def delete_account(student_id: str):
         connection.commit()
 
         # ----------------------------------------------------
-        # DELETE PROFILE PICTURE FROM SERVER STORAGE
+        # DELETE PROFILE PICTURE
         #
-        # The database stores only the filename. The actual
-        # image file must also be removed from disk.
+        # New pictures are stored on Cloudinary. Older accounts
+        # may still contain a local filename, so support both.
         # ----------------------------------------------------
 
         profile_picture_deleted = True
 
         if old_picture:
+            old_picture_value = str(old_picture).strip()
 
-            old_path = PROFILE_DIR / old_picture
+            if old_picture_value.startswith(("http://", "https://")):
+                # New Cloudinary-backed picture.
+                profile_picture_deleted = _delete_cloudinary_picture(
+                    student_id
+                )
 
-            try:
-                if old_path.exists() and old_path.is_file():
-                    old_path.unlink()
-            except OSError:
-                # The account is already deleted from the database.
-                # Keep the response successful but report that the
-                # physical file could not be removed.
-                profile_picture_deleted = False
+            else:
+                # Backward compatibility for old Render-local pictures.
+                old_path = PROFILE_DIR / old_picture_value
+
+                try:
+                    if old_path.exists() and old_path.is_file():
+                        old_path.unlink()
+                except OSError:
+                    profile_picture_deleted = False
 
         return {
             "success": True,
