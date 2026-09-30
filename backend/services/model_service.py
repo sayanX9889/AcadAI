@@ -45,15 +45,33 @@ Rules:
 """
 
 
-def build_messages(prompt: str, system_prompt: str = ""):
+# ============================================================
+# BUILD MESSAGES
+# ============================================================
+
+def build_messages(
+    prompt: str,
+    system_prompt: str = ""
+):
+
     messages = []
 
-    combined_system_prompt = system_prompt.strip()
+    combined_system_prompt = (
+        system_prompt.strip()
+    )
 
     if combined_system_prompt:
-        combined_system_prompt += "\n\n" + CONCISE_INSTRUCTION.strip()
+
+        combined_system_prompt += (
+            "\n\n" +
+            CONCISE_INSTRUCTION.strip()
+        )
+
     else:
-        combined_system_prompt = CONCISE_INSTRUCTION.strip()
+
+        combined_system_prompt = (
+            CONCISE_INSTRUCTION.strip()
+        )
 
     messages.append({
         "role": "system",
@@ -74,7 +92,8 @@ def build_messages(prompt: str, system_prompt: str = ""):
 
 def generate_with_ollama(
     prompt: str,
-    system_prompt: str = ""
+    system_prompt: str = "",
+    max_tokens: int = 300
 ) -> str:
 
     import ollama
@@ -89,13 +108,14 @@ def generate_with_ollama(
         messages=messages,
         options={
             "temperature": 0.2,
-            "num_predict": 300
+            "num_predict": max_tokens
         }
     )
 
     content = response["message"]["content"]
 
     if not content:
+
         raise RuntimeError(
             "Ollama returned an empty response."
         )
@@ -109,12 +129,16 @@ def generate_with_ollama(
 
 def generate_with_openrouter(
     prompt: str,
-    system_prompt: str = ""
+    system_prompt: str = "",
+    max_tokens: int = 300
 ) -> str:
 
-    api_key = os.getenv("OPENROUTER_API_KEY")
+    api_key = os.getenv(
+        "OPENROUTER_API_KEY"
+    )
 
     if not api_key:
+
         raise RuntimeError(
             "OPENROUTER_API_KEY environment variable is not set."
         )
@@ -128,7 +152,7 @@ def generate_with_openrouter(
         "model": OPENROUTER_MODEL,
         "messages": messages,
         "temperature": 0.2,
-        "max_tokens": 8192
+        "max_tokens": max_tokens
     }
 
     headers = {
@@ -146,6 +170,7 @@ def generate_with_openrouter(
     )
 
     if not response.ok:
+
         raise RuntimeError(
             f"OpenRouter API error "
             f"{response.status_code}: {response.text}"
@@ -156,12 +181,19 @@ def generate_with_openrouter(
     choices = data.get("choices")
 
     if not choices:
+
         raise RuntimeError(
             f"OpenRouter returned no choices: {data}"
         )
 
-    message = choices[0].get("message", {})
-    content = message.get("content")
+    message = choices[0].get(
+        "message",
+        {}
+    )
+
+    content = message.get(
+        "content"
+    )
 
     # Some models return content as a list.
     if isinstance(content, list):
@@ -173,23 +205,33 @@ def generate_with_openrouter(
             if isinstance(part, dict):
 
                 if part.get("type") == "text":
+
                     text_parts.append(
                         part.get("text", "")
                     )
 
                 elif "text" in part:
+
                     text_parts.append(
                         part["text"]
                     )
 
-        content = "".join(text_parts)
+        content = "".join(
+            text_parts
+        )
 
-    if not content or not str(content).strip():
+    if (
+        not content
+        or not str(content).strip()
+    ):
+
         raise RuntimeError(
             "OpenRouter returned an empty response."
         )
 
-    return str(content).strip()
+    return str(
+        content
+    ).strip()
 
 
 # ============================================================
@@ -198,21 +240,24 @@ def generate_with_openrouter(
 
 def generate_ai_response(
     prompt: str,
-    system_prompt: str = ""
+    system_prompt: str = "",
+    max_tokens: int = 300
 ) -> str:
 
     if AI_PROVIDER == "ollama":
 
         return generate_with_ollama(
             prompt,
-            system_prompt
+            system_prompt,
+            max_tokens
         )
 
     elif AI_PROVIDER == "openrouter":
 
         return generate_with_openrouter(
             prompt,
-            system_prompt
+            system_prompt,
+            max_tokens
         )
 
     else:
