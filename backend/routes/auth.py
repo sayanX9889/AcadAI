@@ -29,9 +29,10 @@ import hmac
 import secrets
 import os
 import re
-import smtplib
 import traceback
-from email.message import EmailMessage
+import json
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
 from datetime import timedelta
 
 from backend.database import get_connection
@@ -372,34 +373,36 @@ def hash_reset_value(value: str) -> str:
 
 
 def send_password_reset_email(email: str, otp: str):
-    # Primary names used by the password-reset system.
-    # GMAIL_* are supported as a fallback so older deployments do not break.
-    smtp_email = (
-        os.getenv("SMTP_EMAIL")
-        or os.getenv("GMAIL_ADDRESS")
-        or ""
+    """Send the password-reset OTP through Resend's HTTPS API.
+
+    Free/test setup:
+    - Only RESEND_API_KEY is required.
+    - When no sender is configured, Resend's testing sender
+      ``onboarding@resend.dev`` is used automatically.
+    - With that testing sender, Resend only allows delivery to the
+      email address associated with the Resend account.
+
+    Production setup:
+    - After verifying a domain in Resend, set RESEND_FROM_EMAIL to an
+      address on that verified domain.
+    """
+
+    resend_api_key = os.getenv("RESEND_API_KEY", "").strip()
+    resend_from_email = os.getenv(
+        "RESEND_FROM_EMAIL",
+        "onboarding@resend.dev"
     ).strip()
 
-    # Google displays app passwords in groups separated by spaces.
-    # Removing spaces makes the value safe for SMTP authentication.
-    smtp_app_password = (
-        os.getenv("SMTP_APP_PASSWORD")
-        or os.getenv("GMAIL_APP_PASSWORD")
-        or ""
-    ).replace(" ", "").strip()
-
-    if not smtp_email or not smtp_app_password:
+    if not resend_api_key:
         raise RuntimeError(
-            "SMTP email credentials are missing. Set SMTP_EMAIL and "
-            "SMTP_APP_PASSWORD in the deployment environment."
+            "RESEND_API_KEY is not configured in the deployment environment."
         )
 
-    message = EmailMessage()
-    message["Subject"] = "AcadAI Password Reset Code"
-    message["From"] = smtp_email
-    message["To"] = email
-    message.set_content(
-        f"""Hello,
+    if not resend_from_email:
+        resend_from_email = "onboarding@resend.dev"
+
+    subject = "AcadAI Password Reset Code"
+    text_body = f"""Hello,
 
 We received a request to reset your AcadAI password.
 
@@ -414,20 +417,42 @@ If you did not request this password reset, you can safely ignore this email.
 Regards,
 AcadAI
 """
+
+    payload = {
+        "from": resend_from_email,
+        "to": [email],
+        "subject": subject,
+        "text": text_body,
+    }
+
+    request = Request(
+        "https://api.resend.com/emails",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {resend_api_key}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        method="POST",
     )
 
-    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com").strip()
     try:
-        smtp_port = int(os.getenv("SMTP_PORT", "587"))
-    except ValueError:
-        smtp_port = 587
+        with urlopen(request, timeout=30) as response:
+            response_body = response.read().decode("utf-8")
+            if response.status < 200 or response.status >= 300:
+                raise RuntimeError(
+                    f"Resend returned HTTP {response.status}: {response_body}"
+                )
 
-    with smtplib.SMTP(smtp_host, smtp_port, timeout=30) as smtp:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.ehlo()
-        smtp.login(smtp_email, smtp_app_password)
-        smtp.send_message(message)
+    except HTTPError as error:
+        error_body = error.read().decode("utf-8", errors="replace")
+        raise RuntimeError(
+            f"Resend email API error (HTTP {error.code}): {error_body}"
+        ) from error
+    except URLError as error:
+        raise RuntimeError(
+            f"Unable to reach Resend email API: {error.reason}"
+        ) from error
 
 
 @router.post("/forgot-password")
