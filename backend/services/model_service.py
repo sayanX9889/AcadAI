@@ -28,6 +28,47 @@ OPENROUTER_URL = (
 
 
 # ============================================================
+# CONCISE RESPONSE INSTRUCTION
+# ============================================================
+
+CONCISE_INSTRUCTION = """
+Answer concisely and directly.
+
+Rules:
+- Give only the information needed to answer the question.
+- Use 2-4 short sentences or short bullet points.
+- Do not repeat information.
+- Do not restate the user's question.
+- Do not add unnecessary background or explanations.
+- For simple factual questions, answer in 1-2 sentences.
+- Use the student's actual data when provided.
+"""
+
+
+def build_messages(prompt: str, system_prompt: str = ""):
+    messages = []
+
+    combined_system_prompt = system_prompt.strip()
+
+    if combined_system_prompt:
+        combined_system_prompt += "\n\n" + CONCISE_INSTRUCTION.strip()
+    else:
+        combined_system_prompt = CONCISE_INSTRUCTION.strip()
+
+    messages.append({
+        "role": "system",
+        "content": combined_system_prompt
+    })
+
+    messages.append({
+        "role": "user",
+        "content": prompt
+    })
+
+    return messages
+
+
+# ============================================================
 # OLLAMA
 # ============================================================
 
@@ -36,30 +77,19 @@ def generate_with_ollama(
     system_prompt: str = ""
 ) -> str:
 
-    # Import Ollama only when it is actually being used.
-    # This prevents cloud deployment from requiring
-    # a running Ollama server.
-
     import ollama
 
-    messages = []
-
-    if system_prompt:
-        messages.append({
-            "role": "system",
-            "content": system_prompt
-        })
-
-    messages.append({
-        "role": "user",
-        "content": prompt
-    })
+    messages = build_messages(
+        prompt,
+        system_prompt
+    )
 
     response = ollama.chat(
         model=OLLAMA_MODEL,
         messages=messages,
         options={
-            "temperature": 0.2
+            "temperature": 0.2,
+            "num_predict": 300
         }
     )
 
@@ -89,18 +119,10 @@ def generate_with_openrouter(
             "OPENROUTER_API_KEY environment variable is not set."
         )
 
-    messages = []
-
-    if system_prompt:
-        messages.append({
-            "role": "system",
-            "content": system_prompt
-        })
-
-    messages.append({
-        "role": "user",
-        "content": prompt
-    })
+    messages = build_messages(
+        prompt,
+        system_prompt
+    )
 
     payload = {
         "model": OPENROUTER_MODEL,
@@ -131,9 +153,6 @@ def generate_with_openrouter(
 
     data = response.json()
 
-    # Keep the actual OpenRouter response visible in logs
-    print("OpenRouter response:", data)
-
     choices = data.get("choices")
 
     if not choices:
@@ -144,7 +163,7 @@ def generate_with_openrouter(
     message = choices[0].get("message", {})
     content = message.get("content")
 
-    # Some models may return content as a list
+    # Some models return content as a list.
     if isinstance(content, list):
 
         text_parts = []
@@ -167,8 +186,7 @@ def generate_with_openrouter(
 
     if not content or not str(content).strip():
         raise RuntimeError(
-            f"OpenRouter returned an empty response. "
-            f"Full response: {data}"
+            "OpenRouter returned an empty response."
         )
 
     return str(content).strip()
