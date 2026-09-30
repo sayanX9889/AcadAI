@@ -1285,25 +1285,88 @@
       const list = document.getElementById("notification-list");
       const badge = document.getElementById("notification-badge");
       if (!list || !badge) return;
+
       const unreadCount = notifications.filter(n => !n.is_read).length;
-      if (unreadCount > 0) { badge.textContent = unreadCount > 9 ? "9+" : unreadCount; badge.classList.remove("hidden"); }
-      else badge.classList.add("hidden");
-      if (!notifications.length) {
-        list.innerHTML = `<div class="p-8 text-center"><div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-slate-100 text-slate-400"><i class="fa-regular fa-bell-slash"></i></div><p class="mt-3 text-sm font-semibold text-slate-700">No notifications</p><p class="mt-1 text-xs text-slate-400">You're all caught up.</p></div>`; return;
+      if (unreadCount > 0) {
+        badge.textContent = unreadCount > 9 ? "9+" : unreadCount;
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
       }
+
+      if (!notifications.length) {
+        list.innerHTML = `<div class="p-8 text-center"><div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-slate-100 text-slate-400"><i class="fa-regular fa-bell-slash"></i></div><p class="mt-3 text-sm font-semibold text-slate-700">No notifications</p><p class="mt-1 text-xs text-slate-400">You're all caught up.</p></div>`;
+        return;
+      }
+
       list.innerHTML = notifications.map(n => {
         const unread = !n.is_read;
-        return `<button type="button" onclick="openNotification(${n.id})" class="w-full border-b border-slate-100 px-4 py-4 text-left transition hover:bg-slate-50 ${unread ? "bg-indigo-50/40" : "bg-white"}"><div class="flex gap-3"><div class="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg ${unread ? "bg-indigo-100 text-indigo-600" : "bg-slate-100 text-slate-500"}"><i class="fa-solid fa-bell"></i></div><div class="min-w-0 flex-1"><div class="flex items-start justify-between gap-2"><h4 class="text-sm font-semibold text-slate-800">${escapeNotificationHTML(n.title)}</h4>${unread ? '<span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-indigo-600"></span>' : ''}</div><p class="mt-1 text-xs leading-5 text-slate-600">${escapeNotificationHTML(n.message)}</p><p class="mt-2 text-[11px] text-slate-400">${formatNotificationDate(n.created_at)}</p></div></div></button>`;
+        return `<div class="w-full border-b border-slate-100 px-4 py-4 transition hover:bg-slate-50 ${unread ? "bg-indigo-50/40" : "bg-white"}">
+          <div class="flex gap-3">
+            <button type="button" onclick="openNotification(${n.id})" class="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg ${unread ? "bg-indigo-100 text-indigo-600" : "bg-slate-100 text-slate-500"}" aria-label="Mark notification as read">
+              <i class="fa-solid fa-bell"></i>
+            </button>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2">
+                    <h4 class="text-sm font-semibold text-slate-800">${escapeNotificationHTML(n.title)}</h4>
+                    ${unread ? '<span class="h-2 w-2 shrink-0 rounded-full bg-indigo-600"></span>' : ''}
+                  </div>
+                  <p class="mt-1 text-xs leading-5 text-slate-600">${escapeNotificationHTML(n.message)}</p>
+                  <p class="mt-2 text-[11px] text-slate-400">${formatNotificationDate(n.created_at)}</p>
+                </div>
+                <button type="button" onclick="deleteNotification(${n.id}, event)" class="shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600" aria-label="Delete notification" title="Delete notification">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>`;
       }).join("");
     }
 
     async function openNotification(id) {
       const n = notifications.find(item => item.id === id);
       if (!n || n.is_read) return;
+
       try {
         const response = await fetch(`${API_URL}/notifications/${id}/read?student_id=${encodeURIComponent(STUDENT_ID)}`, { method: "PATCH" });
-        if (response.ok) { n.is_read = true; renderNotifications(); }
-      } catch (error) { console.error("Unable to mark notification as read:", error); }
+        if (response.ok) {
+          n.is_read = true;
+          renderNotifications();
+        }
+      } catch (error) {
+        console.error("Unable to mark notification as read:", error);
+      }
+    }
+
+    async function deleteNotification(id, event) {
+      if (event) event.stopPropagation();
+
+      const notification = notifications.find(item => item.id === id);
+      if (!notification) return;
+
+      if (!confirm("Delete this notification?")) return;
+
+      try {
+        const response = await fetch(
+          `${API_URL}/notifications/${id}?student_id=${encodeURIComponent(STUDENT_ID)}`,
+          { method: "DELETE" }
+        );
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.detail || data.message || "Unable to delete notification.");
+        }
+
+        notifications = notifications.filter(item => item.id !== id);
+        renderNotifications();
+      } catch (error) {
+        console.error("Unable to delete notification:", error);
+        alert(error.message || "Unable to delete notification.");
+      }
     }
 
     function toggleNotifications() {

@@ -338,3 +338,47 @@ def mark_notification_read(
 
     finally:
         connection.close()
+
+# ============================================================
+# DELETE NOTIFICATION
+# ============================================================
+
+@router.delete("/{notification_id}")
+def delete_notification(
+    notification_id: int,
+    student_id: str
+):
+    """Permanently delete one notification belonging to the student."""
+    student_id = student_id.strip().upper()
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            DELETE FROM notifications
+            WHERE id = ?
+              AND student_id = ?
+            """,
+            (notification_id, student_id)
+        )
+
+        if cursor.rowcount != 1:
+            connection.rollback()
+            raise HTTPException(status_code=404, detail="Notification not found.")
+
+        connection.commit()
+        return {
+            "success": True,
+            "message": "Notification deleted successfully.",
+            "notification_id": notification_id
+        }
+
+    except HTTPException:
+        raise
+    except Exception as error:
+        connection.rollback()
+        raise HTTPException(status_code=500, detail="Unable to delete notification.")
+    finally:
+        connection.close()
