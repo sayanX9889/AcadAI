@@ -16,9 +16,10 @@ OLLAMA_MODEL = os.getenv(
     "llama3.2:1b"
 )
 
+# OpenRouter Free Models Router
 OPENROUTER_MODEL = os.getenv(
     "OPENROUTER_MODEL",
-    "google/gemma-4-26b-a4b-it:free"
+    "openrouter/free"
 )
 
 OPENROUTER_URL = (
@@ -76,7 +77,11 @@ def generate_with_ollama(
 # OPENROUTER
 # ============================================================
 
-def generate_with_openrouter(prompt: str, system_prompt: str = "") -> str:
+def generate_with_openrouter(
+    prompt: str,
+    system_prompt: str = ""
+) -> str:
+
     api_key = os.getenv("OPENROUTER_API_KEY")
 
     if not api_key:
@@ -101,10 +106,7 @@ def generate_with_openrouter(prompt: str, system_prompt: str = "") -> str:
         "model": OPENROUTER_MODEL,
         "messages": messages,
         "temperature": 0.2,
-        "max_tokens": 8192,
-        "response_format": {
-            "type": "json_object"
-        }
+        "max_tokens": 8192
     }
 
     headers = {
@@ -144,14 +146,22 @@ def generate_with_openrouter(prompt: str, system_prompt: str = "") -> str:
 
     # Some models may return content as a list
     if isinstance(content, list):
+
         text_parts = []
 
         for part in content:
+
             if isinstance(part, dict):
+
                 if part.get("type") == "text":
-                    text_parts.append(part.get("text", ""))
+                    text_parts.append(
+                        part.get("text", "")
+                    )
+
                 elif "text" in part:
-                    text_parts.append(part["text"])
+                    text_parts.append(
+                        part["text"]
+                    )
 
         content = "".join(text_parts)
 
