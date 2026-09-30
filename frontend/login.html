@@ -147,9 +147,9 @@
                         <div class="mt-2 text-right">
                             <button
                                 type="button"
-                                id="forgot-password-link"
+                                id="update-password-link"
                                 class="text-sm font-semibold text-indigo-600 hover:text-indigo-700 hover:underline">
-                                Forgot Password?
+                                Update Password?
                             </button>
                         </div>
 
@@ -202,143 +202,98 @@
 
 
 
-    <!-- PASSWORD RESET MODAL -->
-    <div id="password-reset-modal"
+    <!-- UPDATE PASSWORD MODAL -->
+    <div id="update-password-modal"
          class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
         <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
 
-            <!-- STEP 1 -->
-            <div id="reset-step-email">
-                <div class="mb-6 flex items-start justify-between">
-                    <div>
-                        <h3 class="text-2xl font-bold text-slate-900">Reset Your Password</h3>
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            Enter your registered email address.
-                        </p>
-                    </div>
-                    <button type="button" onclick="closePasswordReset()"
-                            class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                            aria-label="Close">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <form id="forgot-password-form" class="space-y-5">
-                    <div>
-                        <label for="reset-email" class="mb-2 block text-sm font-semibold text-slate-700">
-                            Registered Email
-                        </label>
-                        <input id="reset-email" type="email" required
-                               placeholder="example@gmail.com"
-                               class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
-                    </div>
-
-                    <div id="reset-email-message" class="hidden rounded-lg border p-3 text-sm"></div>
-
-                    <button id="send-reset-code-button" type="submit"
-                            class="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700">
-                        <i class="fa-solid fa-paper-plane mr-2"></i>
-                        Send Reset Code
-                    </button>
-
-                    <button type="button" onclick="closePasswordReset()"
-                            class="w-full text-sm font-semibold text-slate-500 hover:text-indigo-600">
-                        ← Back to Login
-                    </button>
-                </form>
-            </div>
-
-            <!-- STEP 2 -->
-            <div id="reset-step-code" class="hidden">
-                <div class="mb-6 flex items-start justify-between">
-                    <div>
-                        <h3 class="text-2xl font-bold text-slate-900">Verify Reset Code</h3>
-                        <p class="mt-2 text-sm leading-6 text-slate-500">
-                            Enter the 6-digit code sent to your email.
-                        </p>
-                    </div>
-                    <button type="button" onclick="closePasswordReset()"
-                            class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <form id="verify-reset-form" class="space-y-5">
-                    <div>
-                        <label for="reset-code" class="mb-2 block text-sm font-semibold text-slate-700">
-                            6-Digit Code
-                        </label>
-                        <input id="reset-code" type="text" inputmode="numeric"
-                               autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required
-                               placeholder="123456"
-                               class="w-full rounded-xl border border-slate-300 px-4 py-3 text-center text-xl font-bold tracking-[0.5em] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
-                    </div>
-
-                    <div id="verify-reset-message" class="hidden rounded-lg border p-3 text-sm"></div>
-
-                    <button id="verify-reset-button" type="submit"
-                            class="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700">
-                        Verify Code
-                    </button>
-
-                    <button id="resend-reset-code" type="button"
-                            class="w-full text-sm font-semibold text-indigo-600 hover:text-indigo-700">
-                        Resend Code
-                    </button>
-                </form>
-            </div>
-
-            <!-- STEP 3 -->
-            <div id="reset-step-password" class="hidden">
-                <div class="mb-6">
-                    <h3 class="text-2xl font-bold text-slate-900">Create New Password</h3>
+            <div class="mb-6 flex items-start justify-between">
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900">Update Password</h3>
                     <p class="mt-2 text-sm leading-6 text-slate-500">
-                        Choose a new password for your AcadAI account.
+                        Change your AcadAI account password.
                     </p>
                 </div>
 
-                <form id="reset-password-form" class="space-y-5">
-                    <div>
-                        <label for="new-reset-password" class="mb-2 block text-sm font-semibold text-slate-700">
-                            New Password
-                        </label>
-                        <div class="relative">
-                            <input id="new-reset-password" type="password" required
-                                   minlength="6" placeholder="Enter new password"
-                                   class="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
-                            <button type="button"
-                                    onclick="togglePassword('new-reset-password', 'new-reset-password-eye')"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                                <i id="new-reset-password-eye" class="fa-solid fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="confirm-reset-password" class="mb-2 block text-sm font-semibold text-slate-700">
-                            Confirm New Password
-                        </label>
-                        <div class="relative">
-                            <input id="confirm-reset-password" type="password" required
-                                   minlength="6" placeholder="Confirm new password"
-                                   class="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
-                            <button type="button"
-                                    onclick="togglePassword('confirm-reset-password', 'confirm-reset-password-eye')"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                                <i id="confirm-reset-password-eye" class="fa-solid fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="reset-password-message" class="hidden rounded-lg border p-3 text-sm"></div>
-
-                    <button id="reset-password-button" type="submit"
-                            class="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700">
-                        Reset Password
-                    </button>
-                </form>
+                <button type="button" onclick="closeUpdatePassword()"
+                        class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                        aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
+            <form id="update-password-form" class="space-y-5">
+
+                <div>
+                    <label for="update-student-id" class="mb-2 block text-sm font-semibold text-slate-700">
+                        Student ID
+                    </label>
+                    <input id="update-student-id" type="text" required
+                           placeholder="e.g. STU0001"
+                           class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                </div>
+
+                <div>
+                    <label for="update-current-password" class="mb-2 block text-sm font-semibold text-slate-700">
+                        Current Password
+                    </label>
+                    <div class="relative">
+                        <input id="update-current-password" type="password" required
+                               placeholder="Enter current password"
+                               class="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                        <button type="button" onclick="togglePassword('update-current-password', 'update-current-password-eye')"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                aria-label="Show current password">
+                            <i id="update-current-password-eye" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="update-new-password" class="mb-2 block text-sm font-semibold text-slate-700">
+                        New Password
+                    </label>
+                    <div class="relative">
+                        <input id="update-new-password" type="password" required minlength="6"
+                               placeholder="Enter new password"
+                               class="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                        <button type="button" onclick="togglePassword('update-new-password', 'update-new-password-eye')"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                aria-label="Show new password">
+                            <i id="update-new-password-eye" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="update-confirm-password" class="mb-2 block text-sm font-semibold text-slate-700">
+                        Confirm New Password
+                    </label>
+                    <div class="relative">
+                        <input id="update-confirm-password" type="password" required minlength="6"
+                               placeholder="Confirm new password"
+                               class="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                        <button type="button" onclick="togglePassword('update-confirm-password', 'update-confirm-password-eye')"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                aria-label="Show confirmed password">
+                            <i id="update-confirm-password-eye" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="update-password-message" class="hidden rounded-lg border p-3 text-sm"></div>
+
+                <button id="update-password-button" type="submit"
+                        class="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700">
+                    <i class="fa-solid fa-key mr-2"></i>
+                    Update Password
+                </button>
+
+                <button type="button" onclick="closeUpdatePassword()"
+                        class="w-full text-sm font-semibold text-slate-500 hover:text-indigo-600">
+                    ← Back to Login
+                </button>
+            </form>
         </div>
     </div>
 
@@ -367,253 +322,133 @@
 
 
         // =========================================================
-        // PASSWORD RESET FLOW
+        // UPDATE PASSWORD FLOW
         // =========================================================
 
-        let resetEmail = "";
-        let resetToken = "";
+        const updatePasswordModal =
+            document.getElementById("update-password-modal");
 
-        const resetModal = document.getElementById("password-reset-modal");
-        const resetEmailStep = document.getElementById("reset-step-email");
-        const resetCodeStep = document.getElementById("reset-step-code");
-        const resetPasswordStep = document.getElementById("reset-step-password");
+        function openUpdatePassword() {
+            updatePasswordModal.classList.remove("hidden");
+            updatePasswordModal.classList.add("flex");
 
-        function openPasswordReset() {
-            resetModal.classList.remove("hidden");
-            resetModal.classList.add("flex");
-            resetEmailStep.classList.remove("hidden");
-            resetCodeStep.classList.add("hidden");
-            resetPasswordStep.classList.add("hidden");
+            const savedStudentId =
+                localStorage.getItem("student_id") || "";
 
-            const loginEmail = localStorage.getItem("student_email") || "";
-            document.getElementById("reset-email").value = loginEmail;
-            document.getElementById("reset-email").focus();
+            document.getElementById("update-student-id").value = savedStudentId;
+            document.getElementById("update-current-password").value = "";
+            document.getElementById("update-new-password").value = "";
+            document.getElementById("update-confirm-password").value = "";
+            clearUpdatePasswordMessage();
+
+            document.getElementById("update-student-id").focus();
         }
 
-        function closePasswordReset() {
-            resetModal.classList.add("hidden");
-            resetModal.classList.remove("flex");
-            resetEmail = "";
-            resetToken = "";
+        function closeUpdatePassword() {
+            updatePasswordModal.classList.add("hidden");
+            updatePasswordModal.classList.remove("flex");
+            clearUpdatePasswordMessage();
         }
 
-        function showResetMessage(id, message, success = false) {
-            const element = document.getElementById(id);
+        function showUpdatePasswordMessage(message, success = false) {
+            const element = document.getElementById("update-password-message");
+
             element.textContent = message;
             element.classList.remove(
                 "hidden",
-                "border-red-200",
-                "bg-red-50",
-                "text-red-700",
-                "border-emerald-200",
-                "bg-emerald-50",
-                "text-emerald-700"
+                "border-red-200", "bg-red-50", "text-red-700",
+                "border-emerald-200", "bg-emerald-50", "text-emerald-700"
             );
 
             if (success) {
                 element.classList.add(
-                    "border-emerald-200",
-                    "bg-emerald-50",
-                    "text-emerald-700"
+                    "border-emerald-200", "bg-emerald-50", "text-emerald-700"
                 );
             } else {
                 element.classList.add(
-                    "border-red-200",
-                    "bg-red-50",
-                    "text-red-700"
+                    "border-red-200", "bg-red-50", "text-red-700"
                 );
             }
         }
 
-        function clearResetMessage(id) {
-            document.getElementById(id).classList.add("hidden");
+        function clearUpdatePasswordMessage() {
+            const element = document.getElementById("update-password-message");
+            if (element) element.classList.add("hidden");
         }
 
         document
-            .getElementById("forgot-password-link")
-            .addEventListener("click", openPasswordReset);
+            .getElementById("update-password-link")
+            .addEventListener("click", openUpdatePassword);
+
+        updatePasswordModal.addEventListener("click", function (event) {
+            if (event.target === updatePasswordModal) {
+                closeUpdatePassword();
+            }
+        });
 
         document
-            .getElementById("forgot-password-form")
+            .getElementById("update-password-form")
             .addEventListener("submit", async function (event) {
                 event.preventDefault();
 
-                const email = document.getElementById("reset-email").value.trim().toLowerCase();
-                const button = document.getElementById("send-reset-code-button");
+                const studentId = document
+                    .getElementById("update-student-id")
+                    .value.trim().toUpperCase();
 
-                clearResetMessage("reset-email-message");
+                const currentPassword = document
+                    .getElementById("update-current-password")
+                    .value;
 
-                if (!email) return;
+                const newPassword = document
+                    .getElementById("update-new-password")
+                    .value;
 
-                button.disabled = true;
-                button.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Sending...';
+                const confirmPassword = document
+                    .getElementById("update-confirm-password")
+                    .value;
 
-                try {
-                    const response = await fetch(`${API_URL}/auth/forgot-password`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ email })
-                    });
+                const button = document.getElementById("update-password-button");
 
-                    const data = await response.json();
+                clearUpdatePasswordMessage();
 
-                    if (!response.ok || !data.success) {
-                        throw new Error(data.detail || data.error || "Unable to send reset code.");
-                    }
-
-                    resetEmail = email;
-
-                    showResetMessage(
-                        "reset-email-message",
-                        "If an account exists for this email, a reset code has been sent.",
-                        true
-                    );
-
-                    resetEmailStep.classList.add("hidden");
-                    resetCodeStep.classList.remove("hidden");
-                    document.getElementById("reset-code").focus();
-
-                } catch (error) {
-                    showResetMessage("reset-email-message", error.message);
-                } finally {
-                    button.disabled = false;
-                    button.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i>Send Reset Code';
-                }
-            });
-
-        document
-            .getElementById("verify-reset-form")
-            .addEventListener("submit", async function (event) {
-                event.preventDefault();
-
-                const code = document.getElementById("reset-code").value.trim();
-                const button = document.getElementById("verify-reset-button");
-
-                clearResetMessage("verify-reset-message");
-
-                if (!/^\d{6}$/.test(code)) {
-                    showResetMessage(
-                        "verify-reset-message",
-                        "Enter the 6-digit reset code."
-                    );
+                if (!studentId) {
+                    showUpdatePasswordMessage("Enter your Student ID.");
                     return;
                 }
 
-                button.disabled = true;
-                button.textContent = "Verifying...";
-
-                try {
-                    const response = await fetch(`${API_URL}/auth/verify-reset-code`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            email: resetEmail,
-                            code: code
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok || !data.success) {
-                        throw new Error(data.detail || data.error || "Invalid or expired reset code.");
-                    }
-
-                    resetToken = data.reset_token;
-
-                    resetCodeStep.classList.add("hidden");
-                    resetPasswordStep.classList.remove("hidden");
-                    document.getElementById("new-reset-password").focus();
-
-                } catch (error) {
-                    showResetMessage("verify-reset-message", error.message);
-                } finally {
-                    button.disabled = false;
-                    button.textContent = "Verify Code";
+                if (!currentPassword) {
+                    showUpdatePasswordMessage("Enter your current password.");
+                    return;
                 }
-            });
-
-        document
-            .getElementById("resend-reset-code")
-            .addEventListener("click", async function () {
-                if (!resetEmail) return;
-
-                const button = this;
-                button.disabled = true;
-                button.textContent = "Sending...";
-
-                try {
-                    const response = await fetch(`${API_URL}/auth/forgot-password`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ email: resetEmail })
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok || !data.success) {
-                        throw new Error(data.detail || data.error || "Unable to resend reset code.");
-                    }
-
-                    document.getElementById("reset-code").value = "";
-                    showResetMessage(
-                        "verify-reset-message",
-                        "A new reset code has been sent.",
-                        true
-                    );
-
-                } catch (error) {
-                    showResetMessage("verify-reset-message", error.message);
-                } finally {
-                    button.disabled = false;
-                    button.textContent = "Resend Code";
-                }
-            });
-
-        document
-            .getElementById("reset-password-form")
-            .addEventListener("submit", async function (event) {
-                event.preventDefault();
-
-                const newPassword = document.getElementById("new-reset-password").value;
-                const confirmPassword = document.getElementById("confirm-reset-password").value;
-                const button = document.getElementById("reset-password-button");
-
-                clearResetMessage("reset-password-message");
 
                 if (newPassword.length < 6) {
-                    showResetMessage(
-                        "reset-password-message",
-                        "Password must be at least 6 characters."
-                    );
+                    showUpdatePasswordMessage("New password must be at least 6 characters.");
                     return;
                 }
 
                 if (newPassword !== confirmPassword) {
-                    showResetMessage(
-                        "reset-password-message",
-                        "Passwords do not match."
-                    );
+                    showUpdatePasswordMessage("New passwords do not match.");
+                    return;
+                }
+
+                if (currentPassword === newPassword) {
+                    showUpdatePasswordMessage("New password must be different from your current password.");
                     return;
                 }
 
                 button.disabled = true;
-                button.textContent = "Resetting...";
+                button.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Updating...';
 
                 try {
-                    const response = await fetch(`${API_URL}/auth/reset-password`, {
+                    const response = await fetch(`${API_URL}/auth/update-password`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            email: resetEmail,
-                            reset_token: resetToken,
+                            student_id: studentId,
+                            current_password: currentPassword,
                             new_password: newPassword
                         })
                     });
@@ -621,36 +456,70 @@
                     const data = await response.json();
 
                     if (!response.ok || !data.success) {
-                        throw new Error(data.detail || data.error || "Unable to reset password.");
+                        throw new Error(
+                            data.detail ||
+                            data.error ||
+                            "Unable to update password."
+                        );
                     }
 
-                    showResetMessage(
-                        "reset-password-message",
-                        "Password reset successfully. Returning to login...",
+                    showUpdatePasswordMessage(
+                        "Password updated successfully. Signing you in...",
                         true
                     );
 
-                    document.getElementById("new-reset-password").value = "";
-                    document.getElementById("confirm-reset-password").value = "";
+                    // ------------------------------------------------
+                    // AUTOMATIC LOGIN WITH NEW PASSWORD
+                    // ------------------------------------------------
+                    const loginResponse = await fetch(`${API_URL}/auth/login`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            student_id: studentId,
+                            password: newPassword
+                        })
+                    });
 
+                    const loginData = await loginResponse.json();
+
+                    if (!loginResponse.ok || !loginData.success) {
+                        throw new Error(
+                            "Password updated, but automatic login failed. Please sign in again."
+                        );
+                    }
+
+                    localStorage.setItem(
+                        "student_id",
+                        loginData.student.student_id
+                    );
+
+                    localStorage.setItem(
+                        "student_name",
+                        loginData.student.full_name
+                    );
+
+                    localStorage.setItem(
+                        "student_email",
+                        loginData.student.email
+                    );
+
+                    // Give the success message a moment to render.
                     setTimeout(() => {
-                        closePasswordReset();
-                        document.getElementById("password").focus();
-                    }, 1600);
+                        window.location.href = "dashboard.html";
+                    }, 700);
 
                 } catch (error) {
-                    showResetMessage("reset-password-message", error.message);
+                    showUpdatePasswordMessage(
+                        error.message || "Unable to update password."
+                    );
                 } finally {
                     button.disabled = false;
-                    button.textContent = "Reset Password";
+                    button.innerHTML =
+                        '<i class="fa-solid fa-key mr-2"></i>Update Password';
                 }
             });
-
-        resetModal.addEventListener("click", function (event) {
-            if (event.target === resetModal) {
-                closePasswordReset();
-            }
-        });
 
         document
             .getElementById("login-form")

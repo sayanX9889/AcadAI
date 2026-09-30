@@ -160,6 +160,13 @@ class LoginRequest(BaseModel):
     student_id: str
     password: str
 
+
+class UpdatePasswordRequest(BaseModel):
+
+    student_id: str
+    current_password: str
+    new_password: str
+
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
@@ -404,7 +411,105 @@ def login(request: LoginRequest):
                 user["email"]
         }
     }
-    # ============================================================
+    
+
+# ============================================================
+# UPDATE PASSWORD
+# ============================================================
+
+@router.post("/update-password")
+def update_password(request: UpdatePasswordRequest):
+
+    student_id = request.student_id.strip().upper()
+    current_password = request.current_password
+    new_password = request.new_password
+
+    if len(new_password) < 6:
+        raise HTTPException(
+            status_code=400,
+            detail="New password must be at least 6 characters."
+        )
+
+    if current_password == new_password:
+        raise HTTPException(
+            status_code=400,
+            detail="New password must be different from your current password."
+        )
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT student_id, password_hash
+            FROM users
+            WHERE student_id = ?
+            """,
+            (student_id,)
+        )
+
+        user = cursor.fetchone()
+
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="Student account not found."
+            )
+
+        if not verify_password(
+            current_password,
+            user["password_hash"]
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail="Current password is incorrect."
+            )
+
+        new_password_hash = hash_password(new_password)
+
+        cursor.execute(
+            """
+            UPDATE users
+            SET password_hash = ?
+            WHERE student_id = ?
+            """,
+            (new_password_hash, student_id)
+        )
+
+        if cursor.rowcount != 1:
+            raise HTTPException(
+                status_code=404,
+                detail="Student account not found."
+            )
+
+        connection.commit()
+
+        return {
+            "success": True,
+            "message": "Password updated successfully."
+        }
+
+    except HTTPException:
+        connection.rollback()
+        raise
+
+    except Exception as error:
+        connection.rollback()
+        print("UPDATE PASSWORD ERROR:")
+        print(repr(error))
+        traceback.print_exc()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to update password. Please try again later."
+        )
+
+    finally:
+        connection.close()
+
+
+# ============================================================
 # PASSWORD RESET / EMAIL OTP
 # ============================================================
 
